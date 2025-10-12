@@ -74,7 +74,7 @@ const StatsScreen: React.FC = () => {
         </View>
 
         {/* Period Selection */}
-        <View className="flex-row justify-center space-x-2 py-4 bg-white mx-4 mt-4 rounded-lg shadow-sm">
+        <View className="flex-row justify-center gap-5 py-4 bg-white mx-4 mt-4 rounded-lg shadow-sm">
           <PeriodButton period="week" label="This Week" />
           <PeriodButton period="month" label="This Month" />
           <PeriodButton period="year" label="All Time" />

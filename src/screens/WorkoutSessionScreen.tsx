@@ -10,9 +10,9 @@ type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 interface ExerciseSet {
   id: string;
+  last: string;
   reps: string;
   weight: string;
-  completed: boolean;
 }
 
 interface WorkoutExercise {
@@ -32,38 +32,33 @@ const WorkoutSessionScreen: React.FC = () => {
       id: '1',
       name: 'Bench Press',
       sets: [
-        { id: '1-1', reps: '8', weight: '80', completed: false },
-        { id: '1-2', reps: '8', weight: '80', completed: false },
-        { id: '1-3', reps: '8', weight: '80', completed: false },
+        { id: '1-1', last: '8x12kg', reps: '8', weight: '80' },
+        { id: '1-2', last: '8x12kg', reps: '8', weight: '80' },
+        { id: '1-3', last: '8x12kg', reps: '8', weight: '80' },
       ],
     },
     {
       id: '2',
       name: 'Incline Dumbbell Press',
       sets: [
-        { id: '2-1', reps: '10', weight: '25', completed: false },
-        { id: '2-2', reps: '10', weight: '25', completed: false },
-        { id: '2-3', reps: '10', weight: '25', completed: false },
+        { id: '2-1', last: '10x25kg', reps: '10', weight: '25' },
+        { id: '2-2', last: '10x25kg', reps: '10', weight: '25' },
+        { id: '2-3', last: '10x25kg', reps: '10', weight: '25' },
+      ],
+    },
+    { id: '3', name: 'Push Ups', sets: [{ id: '3-1', last: '15xBW', reps: '15', weight: 'bodyweight' }] },
+    {
+      id: '4',
+      name: 'Dumbbell Flyes',
+      sets: [
+        { id: '4-1', last: '12x15kg', reps: '12', weight: '15' },
+        { id: '4-2', last: '12x15kg', reps: '12', weight: '15' },
+        { id: '4-3', last: '12x15kg', reps: '12', weight: '15' },
       ],
     },
   ]);
   const [workoutStarted, setWorkoutStarted] = useState(false);
   const [workoutNotes, setWorkoutNotes] = useState('');
-
-  const toggleSetCompleted = (exerciseId: string, setId: string) => {
-    setExercises(exercises.map(exercise => 
-      exercise.id === exerciseId 
-        ? {
-            ...exercise,
-            sets: exercise.sets.map(set => 
-              set.id === setId 
-                ? { ...set, completed: !set.completed }
-                : set
-            )
-          }
-        : exercise
-    ));
-  };
 
   const updateSetValue = (exerciseId: string, setId: string, field: 'reps' | 'weight', value: string) => {
     setExercises(exercises.map(exercise => 
@@ -85,11 +80,12 @@ const WorkoutSessionScreen: React.FC = () => {
     if (!exercise) return;
 
     const lastSet = exercise.sets[exercise.sets.length - 1];
+    // TODO: Get the last set weight from the database if available
     const newSet: ExerciseSet = {
       id: `${exerciseId}-${exercise.sets.length + 1}`,
+      last: lastSet?.last || '8x12kg',
       reps: lastSet?.reps || '8',
       weight: lastSet?.weight || '0',
-      completed: false,
     };
 
     setExercises(exercises.map(ex => 
@@ -109,18 +105,9 @@ const WorkoutSessionScreen: React.FC = () => {
   };
 
   const finishWorkout = () => {
-    const completedSets = exercises.reduce((total, exercise) => 
-      total + exercise.sets.filter(set => set.completed).length, 0
-    );
-
-    if (completedSets === 0) {
-      Alert.alert('No Sets Completed', 'Please complete at least one set before finishing.');
-      return;
-    }
-
     Alert.alert(
       'Finish Workout',
-      `You completed ${completedSets} sets. Save this workout?`,
+      'Are you sure you want to finish this workout?',
       [
         { text: 'Cancel', style: 'cancel' },
         { text: 'Save', onPress: () => {
@@ -144,8 +131,11 @@ const WorkoutSessionScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
-      <ScrollView className="flex-1">
+    <View className="flex-1">
+      <ScrollView 
+          showsVerticalScrollIndicator={true}
+          onStartShouldSetResponder={() => true}
+        >
         {/* Workout Header */}
         <View className="bg-white p-4 border-b border-gray-200">
           <TextInput
@@ -180,52 +170,57 @@ const WorkoutSessionScreen: React.FC = () => {
               </Text>
               
               {/* Sets Header */}
-              <View className="flex-row items-center mb-2">
-                <Text className="w-12 text-xs text-gray-500 text-center">Set</Text>
-                <Text className="flex-1 text-xs text-gray-500 text-center">Reps</Text>
-                <Text className="flex-1 text-xs text-gray-500 text-center">Weight (kg)</Text>
-                <Text className="w-12 text-xs text-gray-500 text-center">✓</Text>
+              <View className="flex-row items-center justify-between mb-3">
+                <View className="w-16 items-center">
+                  <Text className="text-xs text-gray-500 font-medium">Set</Text>
+                </View>
+                <View className="w-20 items-center">
+                  <Text className="text-xs text-gray-500 font-medium">Last</Text>
+                </View>
+                <View className="w-16 items-center">
+                  <Text className="text-xs text-gray-500 font-medium">Reps</Text>
+                </View>
+                <View className="w-20 items-center">
+                  <Text className="text-xs text-gray-500 font-medium">Weight (kg)</Text>
+                </View>
               </View>
 
               {/* Sets */}
-              {exercise.sets.map((set, setIndex) => (
-                <View key={set.id} className="flex-row items-center mb-2">
-                  <Text className="w-12 text-center text-gray-700 font-medium">
-                    {setIndex + 1}
-                  </Text>
-                  <TextInput
-                    value={set.reps}
-                    onChangeText={(value) => updateSetValue(exercise.id, set.id, 'reps', value)}
-                    className="flex-1 mx-2 p-2 border border-gray-300 rounded text-center"
-                    keyboardType="numeric"
-                    placeholder="0"
-                  />
-                  <TextInput
-                    value={set.weight}
-                    onChangeText={(value) => updateSetValue(exercise.id, set.id, 'weight', value)}
-                    className="flex-1 mx-2 p-2 border border-gray-300 rounded text-center"
-                    keyboardType="numeric"
-                    placeholder="0"
-                  />
-                  <TouchableOpacity
-                    onPress={() => toggleSetCompleted(exercise.id, set.id)}
-                    className={`w-8 h-8 rounded-full border-2 items-center justify-center ${
-                      set.completed 
-                        ? 'bg-green-600 border-green-600' 
-                        : 'border-gray-300'
-                    }`}
-                  >
-                    {set.completed && (
-                      <Text className="text-white text-xs">✓</Text>
-                    )}
-                  </TouchableOpacity>
-                </View>
-              ))}
+              {exercise.sets.map((set, setIndex) => {                
+                return (
+                  <View key={set.id} className="flex-row items-center justify-between mb-3">
+                    <View className="w-16 items-center justify-center">
+                      <Text className="text-center text-gray-700 font-medium">
+                        {setIndex + 1}
+                      </Text>
+                    </View>
+                    <View className="w-20 items-center justify-center">
+                      <Text className="text-center text-gray-500 text-xs">
+                        {set.last}
+                      </Text>
+                    </View>
+                    <TextInput
+                      value={set.reps}
+                      onChangeText={(value) => updateSetValue(exercise.id, set.id, 'reps', value)}
+                      className="w-16 px-2 py-1 border border-gray-300 rounded text-center"
+                      keyboardType="numeric"
+                      placeholder="0"
+                    />
+                    <TextInput
+                      value={set.weight}
+                      onChangeText={(value) => updateSetValue(exercise.id, set.id, 'weight', value)}
+                      className="w-20 px-2 py-1 border border-gray-300 rounded text-center"
+                      keyboardType="numeric"
+                      placeholder="0"
+                    />
+                  </View>
+                );
+              })}
 
               {/* Add Set Button */}
               <TouchableOpacity
                 onPress={() => addSet(exercise.id)}
-                className="mt-2 bg-gray-100 rounded-lg py-2"
+                className="mt-4 bg-gray-100 rounded-lg py-2"
               >
                 <Text className="text-gray-700 text-center font-medium">
                   + Add Set
@@ -293,7 +288,7 @@ const WorkoutSessionScreen: React.FC = () => {
           </View>
         )}
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

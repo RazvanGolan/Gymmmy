@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, FlatList, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -153,8 +153,12 @@ const WorkoutScreen: React.FC = () => {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
-      <ScrollView className="flex-1">
+    <SafeAreaView className="flex-1">
+      <ScrollView 
+        className="flex-1"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flexGrow: 1 }}
+      >
         {/* Header */}
         <View className="bg-white px-4 py-6 border-b border-gray-200">
           <View className="flex-row justify-between items-center">
@@ -200,7 +204,7 @@ const WorkoutScreen: React.FC = () => {
         )}
 
         {/* Filter Options */}
-        <View className="flex-row justify-center space-x-2 py-4 bg-white mx-4 mt-4 rounded-lg shadow-sm">
+        <View className="flex-row justify-center gap-4 py-4 bg-white mx-4 mt-4 rounded-lg shadow-sm">
           <FilterButton filter="all" label="All" />
           <FilterButton filter="completed" label="Completed" />
           <FilterButton filter="incomplete" label="In Progress" />
@@ -230,13 +234,13 @@ const WorkoutScreen: React.FC = () => {
               </TouchableOpacity>
             </View>
           ) : (
-            <FlatList
-              data={filteredWorkouts}
-              renderItem={renderWorkout}
-              keyExtractor={(item) => item.id}
-              showsVerticalScrollIndicator={false}
-              scrollEnabled={false}
-            />
+            <View>
+              {filteredWorkouts.map(workout => (
+                <View key={workout.id}>
+                  {renderWorkout({ item: workout })}
+                </View>
+              ))}
+            </View>
           )}
         </View>
 

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RootStackParamList } from '../navigation/AppNavigator';
 
 type WorkoutSessionRouteProp = RouteProp<RootStackParamList, 'WorkoutSession'>;
@@ -57,7 +58,6 @@ const WorkoutSessionScreen: React.FC = () => {
       ],
     },
   ]);
-  const [workoutStarted, setWorkoutStarted] = useState(false);
   const [workoutNotes, setWorkoutNotes] = useState('');
 
   const updateSetValue = (exerciseId: string, setId: string, field: 'reps' | 'weight', value: string) => {
@@ -96,13 +96,42 @@ const WorkoutSessionScreen: React.FC = () => {
   };
 
   const addExercise = () => {
-    // TODO: Navigate to exercise selection screen
-    Alert.alert('Add Exercise', 'Exercise selection coming soon!');
+    navigation.navigate('AddExercise', {
+      onSelectExercise: (newExercise) => {
+        setExercises([...exercises, newExercise]);
+      }
+    });
   };
 
-  const startWorkout = () => {
-    setWorkoutStarted(true);
+  const removeSet = (exerciseId: string, setId: string) => {
+    setExercises(exercises.map(exercise => 
+      exercise.id === exerciseId 
+        ? {
+            ...exercise,
+            sets: exercise.sets.filter(set => set.id !== setId)
+          }
+        : exercise
+    ));
   };
+
+  const removeExercise = (exerciseId: string) => {
+    setExercises(exercises.filter(exercise => exercise.id !== exerciseId));
+  };
+
+  const renderDeleteAction = (onDelete: () => void) => {
+    return (
+      <View className="flex-row">
+        <TouchableOpacity
+          onPress={onDelete}
+          className="bg-red-500 justify-center items-center rounded-lg w-20 mb-4 ml-4"
+        >
+          <Icon name="delete" size={24} color="white" />
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+
 
   const finishWorkout = () => {
     Alert.alert(
@@ -131,11 +160,12 @@ const WorkoutSessionScreen: React.FC = () => {
   };
 
   return (
-    <View className="flex-1">
-      <ScrollView 
-          showsVerticalScrollIndicator={true}
-          onStartShouldSetResponder={() => true}
-        >
+    <GestureHandlerRootView className="flex-1">
+      <View className="flex-1">
+        <ScrollView 
+            showsVerticalScrollIndicator={true}
+            onStartShouldSetResponder={() => true}
+          >
         {/* Workout Header */}
         <View className="bg-white p-4 border-b border-gray-200">
           <TextInput
@@ -152,19 +182,17 @@ const WorkoutSessionScreen: React.FC = () => {
               day: 'numeric'
             })}
           </Text>
-          {workoutStarted && (
-            <View className="mt-2 bg-green-100 rounded-lg p-2">
-              <Text className="text-green-800 text-sm font-medium">
-                Workout in progress...
-              </Text>
-            </View>
-          )}
+
         </View>
 
         {/* Exercises */}
         <View className="p-4">
           {exercises.map((exercise, exerciseIndex) => (
-            <View key={exercise.id} className="bg-white rounded-lg p-4 mb-4 shadow-sm">
+            <Swipeable
+              key={exercise.id}
+              renderRightActions={() => renderDeleteAction(() => removeExercise(exercise.id))}
+            >
+              <View className="bg-white rounded-lg p-4 mb-4 shadow-sm">
               <Text className="text-lg font-semibold text-gray-900 mb-3">
                 {exercise.name}
               </Text>
@@ -188,32 +216,37 @@ const WorkoutSessionScreen: React.FC = () => {
               {/* Sets */}
               {exercise.sets.map((set, setIndex) => {                
                 return (
-                  <View key={set.id} className="flex-row items-center justify-between mb-3">
-                    <View className="w-16 items-center justify-center">
-                      <Text className="text-center text-gray-700 font-medium">
-                        {setIndex + 1}
-                      </Text>
+                  <Swipeable
+                    key={set.id}
+                    renderRightActions={() => renderDeleteAction(() => removeSet(exercise.id, set.id))}
+                  >
+                    <View className="flex-row items-center justify-between mb-3 bg-white">
+                      <View className="w-16 items-center justify-center">
+                        <Text className="text-center text-gray-700 font-medium">
+                          {setIndex + 1}
+                        </Text>
+                      </View>
+                      <View className="w-20 items-center justify-center">
+                        <Text className="text-center text-gray-500 text-xs">
+                          {set.last}
+                        </Text>
+                      </View>
+                      <TextInput
+                        value={set.reps}
+                        onChangeText={(value) => updateSetValue(exercise.id, set.id, 'reps', value)}
+                        className="w-16 px-2 py-1 border border-gray-300 rounded text-center"
+                        keyboardType="numeric"
+                        placeholder="0"
+                      />
+                      <TextInput
+                        value={set.weight}
+                        onChangeText={(value) => updateSetValue(exercise.id, set.id, 'weight', value)}
+                        className="w-20 px-2 py-1 border border-gray-300 rounded text-center"
+                        keyboardType="numeric"
+                        placeholder="0"
+                      />
                     </View>
-                    <View className="w-20 items-center justify-center">
-                      <Text className="text-center text-gray-500 text-xs">
-                        {set.last}
-                      </Text>
-                    </View>
-                    <TextInput
-                      value={set.reps}
-                      onChangeText={(value) => updateSetValue(exercise.id, set.id, 'reps', value)}
-                      className="w-16 px-2 py-1 border border-gray-300 rounded text-center"
-                      keyboardType="numeric"
-                      placeholder="0"
-                    />
-                    <TextInput
-                      value={set.weight}
-                      onChangeText={(value) => updateSetValue(exercise.id, set.id, 'weight', value)}
-                      className="w-20 px-2 py-1 border border-gray-300 rounded text-center"
-                      keyboardType="numeric"
-                      placeholder="0"
-                    />
-                  </View>
+                  </Swipeable>
                 );
               })}
 
@@ -226,7 +259,8 @@ const WorkoutSessionScreen: React.FC = () => {
                   + Add Set
                 </Text>
               </TouchableOpacity>
-            </View>
+              </View>
+            </Swipeable>
           ))}
 
           {/* Add Exercise Button */}
@@ -258,37 +292,27 @@ const WorkoutSessionScreen: React.FC = () => {
 
       {/* Bottom Action Buttons */}
       <View className="bg-white border-t border-gray-200 p-4">
-        {!workoutStarted ? (
+        <View className="flex-row justify-between gap-5">
           <TouchableOpacity
-            onPress={startWorkout}
-            className="bg-green-600 rounded-lg py-4"
+            onPress={discardWorkout}
+            className="flex-1 bg-gray-500 rounded-lg py-3"
           >
-            <Text className="text-white text-center font-bold text-lg">
-              Start Workout
+            <Text className="text-white text-center font-medium">
+              Delete Workout
             </Text>
           </TouchableOpacity>
-        ) : (
-          <View className="flex-row space-x-3">
-            <TouchableOpacity
-              onPress={discardWorkout}
-              className="flex-1 bg-gray-200 rounded-lg py-3"
-            >
-              <Text className="text-gray-700 text-center font-medium">
-                Discard
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={finishWorkout}
-              className="flex-1 bg-blue-600 rounded-lg py-3"
-            >
-              <Text className="text-white text-center font-medium">
-                Finish Workout
-              </Text>
-            </TouchableOpacity>
-          </View>
-        )}
+          <TouchableOpacity
+            onPress={finishWorkout}
+            className="flex-1 bg-green-600 rounded-lg py-3"
+          >
+            <Text className="text-white text-center font-medium">
+              Finish Workout
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
+    </GestureHandlerRootView>
   );
 };
 

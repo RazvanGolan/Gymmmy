@@ -13,6 +13,7 @@ import WorkoutSessionScreen from '../screens/WorkoutSessionScreen';
 import ExerciseHistoryScreen from '../screens/ExerciseHistoryScreen';
 import CreateTemplateScreen from '../screens/CreateTemplateScreen';
 import StatsScreen from '../screens/StatsScreen';
+import AddExerciseScreen from '../screens/AddExerciseScreen';
 
 // Navigation Types
 export type RootTabParamList = {
@@ -38,6 +39,18 @@ export type RootStackParamList = {
     templateId?: string; 
   };
   Stats: undefined;
+  AddExercise: {
+    onSelectExercise: (exercise: {
+      id: string;
+      name: string;
+      sets: {
+        id: string;
+        last: string;
+        reps: string;
+        weight: string;
+      }[];
+    }) => void;
+  };
 };
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
@@ -147,6 +160,14 @@ export default function AppNavigator() {
           options={{
             headerShown: true,
             headerTitle: 'Statistics',
+          }}
+        />
+        <Stack.Screen 
+          name="AddExercise" 
+          component={AddExerciseScreen}
+          options={{
+            headerShown: true,
+            headerTitle: 'Add Exercise',
           }}
         />
       </Stack.Navigator>

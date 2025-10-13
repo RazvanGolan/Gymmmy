@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, FlatList } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import { exerciseService, Exercise, categories } from '../services/exerciseService';
 
 type CreateTemplateRouteProp = RouteProp<RootStackParamList, 'CreateTemplate'>;
 type NavigationProp = StackNavigationProp<RootStackParamList>;
@@ -16,18 +18,6 @@ interface TemplateExercise {
   weight?: number;
   notes?: string;
 }
-
-// Mock exercises for selection
-const mockExercises = [
-  { id: '1', name: 'Bench Press', category: 'Chest' },
-  { id: '2', name: 'Squat', category: 'Legs' },
-  { id: '3', name: 'Deadlift', category: 'Back' },
-  { id: '4', name: 'Overhead Press', category: 'Shoulders' },
-  { id: '5', name: 'Pull-ups', category: 'Back' },
-  { id: '6', name: 'Dips', category: 'Chest' },
-  { id: '7', name: 'Barbell Rows', category: 'Back' },
-  { id: '8', name: 'Incline Dumbbell Press', category: 'Chest' },
-];
 
 const CreateTemplateScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
@@ -52,16 +42,23 @@ const CreateTemplateScreen: React.FC = () => {
   );
 
   const [showExerciseSelector, setShowExerciseSelector] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
-  const addExercise = (exerciseId: string, exerciseName: string) => {
+  const availableExercises = exerciseService.searchExercises(searchQuery, selectedCategory)
+    .filter(ex => !exercises.some(templateEx => templateEx.name === ex.name));
+
+  const addExercise = (exercise: Exercise) => {
     const newExercise: TemplateExercise = {
-      id: exerciseId,
-      name: exerciseName,
+      id: Date.now().toString(),
+      name: exercise.name,
       sets: 3,
       reps: 8,
       weight: undefined,
     };
     setExercises([...exercises, newExercise]);
+    setSearchQuery('');
+    setSelectedCategory('All');
     setShowExerciseSelector(false);
   };
 
@@ -162,9 +159,9 @@ const CreateTemplateScreen: React.FC = () => {
     </View>
   );
 
-  const renderAvailableExercise = ({ item }: { item: typeof mockExercises[0] }) => (
+  const renderAvailableExercise = ({ item }: { item: Exercise }) => (
     <TouchableOpacity
-      onPress={() => addExercise(item.id, item.name)}
+      onPress={() => addExercise(item)}
       className="bg-white rounded-lg p-4 mb-2 shadow-sm border border-gray-100"
     >
       <Text className="text-lg font-medium text-gray-900">{item.name}</Text>
@@ -187,11 +184,69 @@ const CreateTemplateScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
         
+        {/* Search Bar */}
+        <View className="bg-white px-4 py-3 border-b border-gray-200">
+          <View className="flex-row items-center bg-gray-100 rounded-lg p-3">
+            <Icon name="search" size={20} color="#6b7280" />
+            <TextInput
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              placeholder="Search exercises..."
+              className="flex-1 ml-2 text-gray-900"
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchQuery('')}>
+                <Icon name="clear" size={20} color="#6b7280" />
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+
+        {/* Category Filter */}
+        <View className="bg-white px-4 py-3 border-b border-gray-200">
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View className="flex-row space-x-2">
+              {categories.map((category) => (
+                <TouchableOpacity
+                  key={category}
+                  onPress={() => setSelectedCategory(category)}
+                  className={`px-4 py-2 rounded-full ${
+                    selectedCategory === category
+                      ? 'bg-blue-600'
+                      : 'bg-gray-200'
+                  }`}
+                >
+                  <Text
+                    className={`font-medium ${
+                      selectedCategory === category
+                        ? 'text-white'
+                        : 'text-gray-700'
+                    }`}
+                  >
+                    {category}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
+        
         <FlatList
-          data={mockExercises.filter(ex => !exercises.some(templateEx => templateEx.id === ex.id))}
+          data={availableExercises}
           renderItem={renderAvailableExercise}
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ padding: 16 }}
+          ListEmptyComponent={
+            <View className="bg-white rounded-lg p-8 items-center">
+              <Icon name="search-off" size={48} color="#9ca3af" />
+              <Text className="text-gray-500 text-lg font-medium mt-4">
+                No exercises found
+              </Text>
+              <Text className="text-gray-400 text-center mt-2">
+                Try adjusting your search or category filter
+              </Text>
+            </View>
+          }
         />
       </SafeAreaView>
     );

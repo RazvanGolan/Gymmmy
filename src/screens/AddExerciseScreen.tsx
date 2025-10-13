@@ -60,16 +60,16 @@ const AddExerciseScreen: React.FC = () => {
   };
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <View className="flex-1 bg-gray-900">
       {/* Search Bar */}
-      <View className="bg-white px-4 py-3 border-b border-gray-200">
-        <View className="flex-row items-center bg-gray-100 rounded-lg p-3">
-          <Icon name="search" size={20} color="#6b7280" />
+      <View className="bg-gray-800 px-4 py-3 border-b border-gray-700">
+        <View className="flex-row items-center bg-gray-700 rounded-lg p-3">
+          <Icon name="search" size={20} color="#9ca3af" />
           <TextInput
             value={searchQuery}
             onChangeText={setSearchQuery}
             placeholder="Search exercises..."
-            className="flex-1 ml-2 text-gray-900"
+            className="flex-1 ml-2 text-gray-200"
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity onPress={() => setSearchQuery('')}>
@@ -80,7 +80,7 @@ const AddExerciseScreen: React.FC = () => {
       </View>
 
       {/* Category Filter */}
-      <View className="bg-white px-4 py-3 border-b border-gray-200">
+      <View className="bg-gray-800 px-4 py-3 border-b border-gray-700">
         <View className="flex-row flex-wrap gap-2">
           {categories.map((category) => (
             <TouchableOpacity
@@ -88,8 +88,8 @@ const AddExerciseScreen: React.FC = () => {
               onPress={() => setSelectedCategory(category)}
               className={`px-4 py-2 rounded-full ${
                 selectedCategory === category
-                  ? 'bg-blue-600'
-                  : 'bg-gray-200'
+                  ? 'bg-slate-600'
+                  : 'bg-gray-700'
               }`}
               style={{ minWidth: '22%' }}
             >
@@ -97,7 +97,7 @@ const AddExerciseScreen: React.FC = () => {
                 className={`font-medium text-center ${
                   selectedCategory === category
                     ? 'text-white'
-                    : 'text-gray-700'
+                    : 'text-gray-300'
                 }`}
               >
                 {category}
@@ -111,9 +111,9 @@ const AddExerciseScreen: React.FC = () => {
       <ScrollView className="flex-1">
         <View className="p-4">
           {filteredExercises.length === 0 ? (
-            <View className="bg-white rounded-lg p-8 items-center">
-              <Icon name="search-off" size={48} color="#9ca3af" />
-              <Text className="text-gray-500 text-lg font-medium mt-4">
+            <View className="bg-gray-800 rounded-lg p-8 items-center">
+              <Icon name="search-off" size={48} color="#6b7280" />
+              <Text className="text-gray-300 text-lg font-medium mt-4">
                 No exercises found
               </Text>
               <Text className="text-gray-400 text-center mt-2">
@@ -125,21 +125,21 @@ const AddExerciseScreen: React.FC = () => {
               <TouchableOpacity
                 key={exercise.id}
                 onPress={() => handleSelectExercise(exercise)}
-                className="bg-white rounded-lg p-4 mb-3 shadow-sm"
+                className="bg-gray-800 rounded-lg p-4 mb-3 shadow-sm"
               >
                 <View className="flex-row items-center justify-between">
                   <View className="flex-1">
-                    <Text className="text-lg font-semibold text-gray-900 mb-1">
+                    <Text className="text-lg font-semibold text-gray-100 mb-1">
                       {exercise.name}
                     </Text>
                     <View className="flex-row items-center">
-                      <Icon name="category" size={16} color="#6b7280" />
-                      <Text className="text-sm text-gray-600 ml-1">
+                      <Icon name="category" size={16} color="#9ca3af" />
+                      <Text className="text-sm text-gray-300 ml-1">
                         {exercise.category}
                       </Text>
                     </View>
                   </View>
-                  <Icon name="add-circle" size={24} color="#3b82f6" />
+                  <Icon name="add-circle" size={24} color="#64748b" />
                 </View>
               </TouchableOpacity>
             ))
@@ -159,22 +159,22 @@ const AddExerciseScreen: React.FC = () => {
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           className="flex-1 bg-black/20 justify-center px-4"
         >
-          <View className="bg-white rounded-lg p-6 max-w-sm mx-auto w-full">
-            <Text className="text-xl font-bold text-gray-900 mb-4">
+          <View className="bg-gray-800 rounded-lg p-6 max-w-sm mx-auto w-full">
+            <Text className="text-xl font-bold text-gray-100 mb-4">
               Create Custom Exercise
             </Text>
             
-            <Text className="text-sm font-medium text-gray-700 mb-2">
+            <Text className="text-sm font-medium text-gray-300 mb-2">
               Exercise Name
             </Text>
             <TextInput
               value={customExerciseName}
               onChangeText={setCustomExerciseName}
               placeholder="Enter exercise name"
-              className="border border-gray-300 rounded-lg p-3 mb-4"
+              className="border border-gray-600 rounded-lg p-3 mb-4 bg-gray-700 text-gray-200"
             />
             
-            <Text className="text-sm font-medium text-gray-700 mb-2">
+            <Text className="text-sm font-medium text-gray-300 mb-2">
               Category
             </Text>
             <View className="flex-row flex-wrap gap-2 mb-6">
@@ -184,8 +184,8 @@ const AddExerciseScreen: React.FC = () => {
                   onPress={() => setCustomExerciseCategory(category)}
                   className={`px-3 py-2 rounded-full ${
                     customExerciseCategory === category
-                      ? 'bg-blue-600'
-                      : 'bg-gray-200'
+                      ? 'bg-slate-600'
+                      : 'bg-gray-700'
                   }`}
                   style={{ minWidth: '22%' }}
                 >
@@ -193,7 +193,7 @@ const AddExerciseScreen: React.FC = () => {
                     className={`font-medium text-center text-xs ${
                       customExerciseCategory === category
                         ? 'text-white'
-                        : 'text-gray-700'
+                        : 'text-gray-300'
                     }`}
                   >
                     {category}
@@ -205,15 +205,15 @@ const AddExerciseScreen: React.FC = () => {
             <View className="flex-row space-x-3 justify-between gap-5">
               <TouchableOpacity
                 onPress={() => setShowCustomModal(false)}
-                className="flex-1 bg-gray-200 rounded-lg py-3"
+                className="flex-1 bg-gray-600 rounded-lg py-3"
               >
-                <Text className="text-gray-700 text-center font-medium">
+                <Text className="text-gray-300 text-center font-medium">
                   Cancel
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={createCustomExercise}
-                className="flex-1 bg-blue-600 rounded-lg py-3"
+                className="flex-1 bg-slate-600 rounded-lg py-3"
               >
                 <Text className="text-white text-center font-medium">
                   Create
@@ -225,13 +225,13 @@ const AddExerciseScreen: React.FC = () => {
       </Modal>
 
       {/* Custom Exercise Button */}
-      <View className="bg-white border-t border-gray-200 p-4">
+      <View className="bg-gray-800 border-t border-gray-700 p-4">
         <TouchableOpacity
           onPress={() => setShowCustomModal(true)}
-          className="bg-gray-100 rounded-lg py-3 flex-row items-center justify-center"
+          className="bg-gray-600 rounded-lg py-3 flex-row items-center justify-center"
         >
-          <Icon name="add" size={20} color="#374151" />
-          <Text className="text-gray-700 font-medium ml-2">
+          <Icon name="add" size={20} color="#d1d5db" />
+          <Text className="text-gray-200 font-medium ml-2">
             Create Custom Exercise
           </Text>
         </TouchableOpacity>

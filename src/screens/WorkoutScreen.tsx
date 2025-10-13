@@ -67,29 +67,29 @@ const WorkoutScreen: React.FC = () => {
     .slice(0, 3);
 
   const renderWorkout = ({ item }: { item: typeof workouts[0] }) => (
-    <View className="bg-white rounded-lg p-4 mb-3 shadow-sm">
+    <View className="bg-gray-800 rounded-lg p-4 mb-3 shadow-sm">
       <View className="flex-row justify-between items-start mb-2">
         <View className="flex-1">
-          <Text className="text-lg font-semibold text-gray-900">
+          <Text className="text-lg font-semibold text-gray-100">
             {item.name || 'Workout'}
           </Text>
-          <Text className="text-gray-600 text-sm">
+          <Text className="text-gray-300 text-sm">
             {format(parseISO(item.date), 'EEEE, MMMM d, yyyy')}
           </Text>
           <View className="flex-row mt-2">
-            <Text className="text-xs text-gray-500 mr-4">
+            <Text className="text-xs text-gray-400 mr-4">
               {item.sets.length} exercises
             </Text>
             {item.duration && (
-              <Text className="text-xs text-gray-500 mr-4">
+              <Text className="text-xs text-gray-400 mr-4">
                 {item.duration}min
               </Text>
             )}
             <View className={`px-2 py-1 rounded ${
-              item.completed ? 'bg-green-100' : 'bg-yellow-100'
+              item.completed ? 'bg-teal-800' : 'bg-amber-800'
             }`}>
               <Text className={`text-xs font-medium ${
-                item.completed ? 'text-green-800' : 'text-yellow-800'
+                item.completed ? 'text-teal-200' : 'text-amber-200'
               }`}>
                 {item.completed ? 'Completed' : 'In Progress'}
               </Text>
@@ -100,12 +100,12 @@ const WorkoutScreen: React.FC = () => {
           onPress={() => handleDeleteWorkout(item.id)}
           className="p-2"
         >
-          <Text className="text-red-600 text-sm">Delete</Text>
+          <Text className="text-red-400 text-sm">Delete</Text>
         </TouchableOpacity>
       </View>
 
       {item.notes && (
-        <Text className="text-gray-600 text-sm mb-3">
+        <Text className="text-gray-300 text-sm mb-3">
           {item.notes}
         </Text>
       )}
@@ -113,16 +113,16 @@ const WorkoutScreen: React.FC = () => {
       <View className="flex-row">
         <TouchableOpacity
           onPress={() => handleEditWorkout(item.id)}
-          className="flex-1 bg-gray-100 rounded-lg py-2 mr-2"
+          className="flex-1 bg-gray-600 rounded-lg py-2 mr-2"
         >
-          <Text className="text-gray-700 text-center font-medium">
+          <Text className="text-gray-200 text-center font-medium">
             {item.completed ? 'View' : 'Continue'}
           </Text>
         </TouchableOpacity>
         {!item.completed && (
           <TouchableOpacity
             onPress={() => handleEditWorkout(item.id)}
-            className="flex-1 bg-blue-600 rounded-lg py-2 ml-2"
+            className="flex-1 bg-slate-600 rounded-lg py-2 ml-2"
           >
             <Text className="text-white text-center font-medium">
               Resume
@@ -138,14 +138,14 @@ const WorkoutScreen: React.FC = () => {
       onPress={() => setSelectedFilter(filter)}
       className={`px-4 py-2 rounded-lg ${
         selectedFilter === filter 
-          ? 'bg-blue-600' 
-          : 'bg-gray-200'
+          ? 'bg-slate-600' 
+          : 'bg-gray-700'
       }`}
     >
       <Text className={`font-medium ${
         selectedFilter === filter 
           ? 'text-white' 
-          : 'text-gray-700'
+          : 'text-gray-300'
       }`}>
         {label}
       </Text>
@@ -153,21 +153,21 @@ const WorkoutScreen: React.FC = () => {
   );
 
   return (
-    <SafeAreaView className="flex-1">
+    <SafeAreaView className="flex-1 bg-gray-900">
       <ScrollView 
         className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}
       >
         {/* Header */}
-        <View className="bg-white px-4 py-6 border-b border-gray-200">
+        <View className="bg-gray-800 px-4 py-6 border-b border-gray-700">
           <View className="flex-row justify-between items-center">
-            <Text className="text-2xl font-bold text-gray-900">
+            <Text className="text-2xl font-bold text-gray-100">
               Workouts
             </Text>
             <TouchableOpacity
               onPress={() => handleStartWorkout()}
-              className="bg-blue-600 rounded-lg px-4 py-2"
+              className="bg-slate-600 rounded-lg px-4 py-2"
             >
               <Text className="text-white font-medium">New Workout</Text>
             </TouchableOpacity>
@@ -176,12 +176,12 @@ const WorkoutScreen: React.FC = () => {
 
         {/* Quick Start Templates */}
         {recentTemplates.length > 0 && (
-          <View className="bg-white mx-4 mt-4 rounded-lg shadow-sm">
-            <View className="p-4 border-b border-gray-100">
-              <Text className="text-lg font-semibold text-gray-900">
+          <View className="bg-gray-800 mx-4 mt-4 rounded-lg shadow-sm">
+            <View className="p-4 border-b border-gray-700">
+              <Text className="text-lg font-semibold text-gray-100">
                 Quick Start
               </Text>
-              <Text className="text-sm text-gray-600">
+              <Text className="text-sm text-gray-300">
                 Start a workout from your most used templates
               </Text>
             </View>
@@ -191,9 +191,9 @@ const WorkoutScreen: React.FC = () => {
                   <TouchableOpacity
                     key={template.id}
                     onPress={() => handleStartWorkout(template.id)}
-                    className="bg-blue-100 rounded-lg px-3 py-2 mr-2 mb-2"
+                    className="bg-slate-700 rounded-lg px-3 py-2 mr-2 mb-2"
                   >
-                    <Text className="text-blue-800 font-medium">
+                    <Text className="text-slate-200 font-medium">
                       {template.name}
                     </Text>
                   </TouchableOpacity>
@@ -204,7 +204,7 @@ const WorkoutScreen: React.FC = () => {
         )}
 
         {/* Filter Options */}
-        <View className="flex-row justify-center gap-4 py-4 bg-white mx-4 mt-4 rounded-lg shadow-sm">
+        <View className="flex-row justify-center gap-4 py-4 bg-gray-800 mx-4 mt-4 rounded-lg shadow-sm">
           <FilterButton filter="all" label="All" />
           <FilterButton filter="completed" label="Completed" />
           <FilterButton filter="incomplete" label="In Progress" />
@@ -213,8 +213,8 @@ const WorkoutScreen: React.FC = () => {
         {/* Workouts List */}
         <View className="px-4 mt-4">
           {filteredWorkouts.length === 0 ? (
-            <View className="bg-white rounded-lg p-8 shadow-sm items-center">
-              <Text className="text-gray-500 text-lg mb-2">
+            <View className="bg-gray-800 rounded-lg p-8 shadow-sm items-center">
+              <Text className="text-gray-300 text-lg mb-2">
                 {selectedFilter === 'all' ? 'No workouts yet' :
                  selectedFilter === 'completed' ? 'No completed workouts' :
                  'No workouts in progress'}
@@ -226,7 +226,7 @@ const WorkoutScreen: React.FC = () => {
               </Text>
               <TouchableOpacity
                 onPress={() => handleStartWorkout()}
-                className="bg-blue-600 rounded-lg px-6 py-3"
+                className="bg-slate-600 rounded-lg px-6 py-3"
               >
                 <Text className="text-white font-medium">
                   Start First Workout

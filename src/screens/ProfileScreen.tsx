@@ -43,12 +43,12 @@ const ProfileScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
+    <SafeAreaView className="flex-1 bg-gray-900">
       <ScrollView className="flex-1">
         {/* Header */}
-        <View className="bg-white px-4 py-6 border-b border-gray-200">
+        <View className="bg-gray-800 px-4 py-6 border-b border-gray-700">
           <View className="items-center">
-            <View className="w-20 h-20 bg-blue-600 rounded-full items-center justify-center mb-3">
+            <View className="w-20 h-20 bg-slate-600 rounded-full items-center justify-center mb-3">
               <Text className="text-white text-2xl font-bold">
                 {mockUser.name.split(' ').map(n => n[0]).join('')}
               </Text>
@@ -61,7 +61,7 @@ const ProfileScreen: React.FC = () => {
             </Text>
             <TouchableOpacity
               onPress={handleEditProfile}
-              className="mt-3 bg-blue-600 rounded-lg px-4 py-2"
+              className="mt-3 bg-slate-600 rounded-lg px-4 py-2"
             >
               <Text className="text-white font-medium">Edit Profile</Text>
             </TouchableOpacity>

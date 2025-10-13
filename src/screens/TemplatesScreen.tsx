@@ -56,13 +56,13 @@ const TemplatesScreen: React.FC = () => {
   };
 
   const renderTemplate = ({ item }: { item: typeof mockTemplates[0] }) => (
-    <View className="bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100">
+    <View className="bg-gray-800 rounded-lg p-4 mb-3 shadow-sm border border-gray-600">
       <View className="flex-row justify-between items-start mb-2">
         <View className="flex-1">
-          <Text className="text-lg font-semibold text-gray-900 mb-1">
+          <Text className="text-lg font-semibold text-gray-100 mb-1">
             {item.name}
           </Text>
-          <Text className="text-gray-600 text-sm mb-2">
+          <Text className="text-gray-300 text-sm mb-2">
             {item.description}
           </Text>
           <View className="flex-row items-center">
@@ -81,14 +81,14 @@ const TemplatesScreen: React.FC = () => {
           onPress={() => handleEditTemplate(item.id)}
           className="p-2"
         >
-          <Text className="text-blue-600 text-sm">Edit</Text>
+          <Text className="text-slate-400 text-sm">Edit</Text>
         </TouchableOpacity>
       </View>
       
-      <View className="flex-row mt-3 pt-3 border-t border-gray-100">
+      <View className="flex-row mt-3 pt-3 border-t border-gray-700">
         <TouchableOpacity
           onPress={() => handleUseTemplate(item.id)}
-          className="flex-1 bg-blue-600 rounded-lg py-3 mr-2"
+          className="flex-1 bg-slate-600 rounded-lg py-3 mr-2"
         >
           <Text className="text-white text-center font-medium">
             Start Workout
@@ -96,9 +96,9 @@ const TemplatesScreen: React.FC = () => {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => handleEditTemplate(item.id)}
-          className="flex-1 bg-gray-100 rounded-lg py-3 ml-2"
+          className="flex-1 bg-gray-600 rounded-lg py-3 ml-2"
         >
-          <Text className="text-gray-700 text-center font-medium">
+          <Text className="text-gray-200 text-center font-medium">
             Customize
           </Text>
         </TouchableOpacity>
@@ -107,15 +107,15 @@ const TemplatesScreen: React.FC = () => {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
-      <View className="px-4 py-3 bg-white border-b border-gray-200">
+    <SafeAreaView className="flex-1 bg-gray-900">
+      <View className="px-4 py-3 bg-gray-800 border-b border-gray-700">
         <View className="flex-row justify-between items-center">
-          <Text className="text-2xl font-bold text-gray-900">
+          <Text className="text-2xl font-bold text-gray-100">
             Workout Templates
           </Text>
           <TouchableOpacity
             onPress={handleCreateTemplate}
-            className="bg-blue-600 rounded-lg px-4 py-2"
+            className="bg-slate-600 rounded-lg px-4 py-2"
           >
             <Text className="text-white font-medium">New Template</Text>
           </TouchableOpacity>

@@ -46,7 +46,7 @@ const StatsScreen: React.FC = () => {
       onPress={() => setSelectedPeriod(period)}
       className={`px-4 py-2 rounded-lg ${
         selectedPeriod === period 
-          ? 'bg-blue-600' 
+          ? 'bg-slate-600' 
           : 'bg-gray-200'
       }`}
     >
@@ -61,11 +61,11 @@ const StatsScreen: React.FC = () => {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
+    <SafeAreaView className="flex-1 bg-gray-900">
       <ScrollView className="flex-1">
         {/* Header */}
-        <View className="bg-white p-4 border-b border-gray-200">
-          <Text className="text-2xl font-bold text-gray-900 mb-2">
+        <View className="bg-gray-800 p-4 border-b border-gray-700">
+          <Text className="text-2xl font-bold text-gray-100 mb-2">
             Your Statistics
           </Text>
           <Text className="text-gray-600">
@@ -99,7 +99,7 @@ const StatsScreen: React.FC = () => {
               </View>
               <View className="w-1/2 mb-4">
                 <View className="items-center">
-                  <Text className="text-2xl font-bold text-green-600">
+                  <Text className="text-2xl font-bold text-teal-400">
                     {formatDuration(mockStats.totalDuration)}
                   </Text>
                   <Text className="text-sm text-gray-600">Total Time</Text>
@@ -107,7 +107,7 @@ const StatsScreen: React.FC = () => {
               </View>
               <View className="w-1/2 mb-4">
                 <View className="items-center">
-                  <Text className="text-2xl font-bold text-purple-600">
+                  <Text className="text-2xl font-bold text-indigo-400">
                     {mockStats.totalSets}
                   </Text>
                   <Text className="text-sm text-gray-600">Total Sets</Text>
@@ -115,7 +115,7 @@ const StatsScreen: React.FC = () => {
               </View>
               <View className="w-1/2 mb-4">
                 <View className="items-center">
-                  <Text className="text-2xl font-bold text-orange-600">
+                  <Text className="text-2xl font-bold text-amber-400">
                     {mockStats.totalReps.toLocaleString()}
                   </Text>
                   <Text className="text-sm text-gray-600">Total Reps</Text>

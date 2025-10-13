@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
@@ -160,21 +160,25 @@ const WorkoutSessionScreen: React.FC = () => {
   };
 
   return (
-    <GestureHandlerRootView className="flex-1">
-      <View className="flex-1">
+    <GestureHandlerRootView className="flex-1 bg-gray-900">
+      <KeyboardAvoidingView 
+        className="flex-1 bg-gray-900"
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 88 : 0}
+      >
         <ScrollView 
             showsVerticalScrollIndicator={true}
             onStartShouldSetResponder={() => true}
           >
         {/* Workout Header */}
-        <View className="bg-white p-4 border-b border-gray-200">
+        <View className="bg-gray-800 p-4 border-b border-gray-700">
           <TextInput
             value={workoutName}
             onChangeText={setWorkoutName}
-            className="text-xl font-bold text-gray-900 mb-2"
+            className="text-xl font-bold text-gray-100 mb-2 bg-transparent"
             placeholder="Workout Name"
           />
-          <Text className="text-gray-600">
+          <Text className="text-gray-300">
             {new Date(date).toLocaleDateString('en-US', { 
               weekday: 'long',
               year: 'numeric',
@@ -192,24 +196,24 @@ const WorkoutSessionScreen: React.FC = () => {
               key={exercise.id}
               renderRightActions={() => renderDeleteAction(() => removeExercise(exercise.id))}
             >
-              <View className="bg-white rounded-lg p-4 mb-4 shadow-sm">
-              <Text className="text-lg font-semibold text-gray-900 mb-3">
+              <View className="bg-gray-800 rounded-lg p-4 mb-4 shadow-sm">
+              <Text className="text-lg font-semibold text-gray-100 mb-3">
                 {exercise.name}
               </Text>
               
               {/* Sets Header */}
               <View className="flex-row items-center justify-between mb-3">
                 <View className="w-16 items-center">
-                  <Text className="text-xs text-gray-500 font-medium">Set</Text>
+                  <Text className="text-xs text-gray-400 font-medium">Set</Text>
                 </View>
                 <View className="w-20 items-center">
-                  <Text className="text-xs text-gray-500 font-medium">Last</Text>
+                  <Text className="text-xs text-gray-400 font-medium">Last</Text>
                 </View>
                 <View className="w-16 items-center">
-                  <Text className="text-xs text-gray-500 font-medium">Reps</Text>
+                  <Text className="text-xs text-gray-400 font-medium">Reps</Text>
                 </View>
                 <View className="w-20 items-center">
-                  <Text className="text-xs text-gray-500 font-medium">Weight (kg)</Text>
+                  <Text className="text-xs text-gray-400 font-medium">Weight (kg)</Text>
                 </View>
               </View>
 
@@ -220,28 +224,28 @@ const WorkoutSessionScreen: React.FC = () => {
                     key={set.id}
                     renderRightActions={() => renderDeleteAction(() => removeSet(exercise.id, set.id))}
                   >
-                    <View className="flex-row items-center justify-between mb-3 bg-white">
+                    <View className="flex-row items-center justify-between mb-3 bg-gray-800">
                       <View className="w-16 items-center justify-center">
-                        <Text className="text-center text-gray-700 font-medium">
+                        <Text className="text-center text-gray-200 font-medium">
                           {setIndex + 1}
                         </Text>
                       </View>
                       <View className="w-20 items-center justify-center">
-                        <Text className="text-center text-gray-500 text-xs">
+                        <Text className="text-center text-gray-400 text-xs">
                           {set.last}
                         </Text>
                       </View>
                       <TextInput
                         value={set.reps}
                         onChangeText={(value) => updateSetValue(exercise.id, set.id, 'reps', value)}
-                        className="w-16 px-2 py-1 border border-gray-300 rounded text-center"
+                        className="w-16 px-2 py-1 border border-gray-600 rounded text-center bg-gray-700 text-gray-200"
                         keyboardType="numeric"
                         placeholder="0"
                       />
                       <TextInput
                         value={set.weight}
                         onChangeText={(value) => updateSetValue(exercise.id, set.id, 'weight', value)}
-                        className="w-20 px-2 py-1 border border-gray-300 rounded text-center"
+                        className="w-20 px-2 py-1 border border-gray-600 rounded text-center bg-gray-700 text-gray-200"
                         keyboardType="numeric"
                         placeholder="0"
                       />
@@ -253,9 +257,9 @@ const WorkoutSessionScreen: React.FC = () => {
               {/* Add Set Button */}
               <TouchableOpacity
                 onPress={() => addSet(exercise.id)}
-                className="mt-4 bg-gray-100 rounded-lg py-2"
+                className="mt-4 bg-gray-600 rounded-lg py-2"
               >
-                <Text className="text-gray-700 text-center font-medium">
+                <Text className="text-gray-200 text-center font-medium">
                   + Add Set
                 </Text>
               </TouchableOpacity>
@@ -266,7 +270,7 @@ const WorkoutSessionScreen: React.FC = () => {
           {/* Add Exercise Button */}
           <TouchableOpacity
             onPress={addExercise}
-            className="bg-blue-600 rounded-lg py-3 mb-4"
+            className="bg-slate-600 rounded-lg py-3 mb-4"
           >
             <Text className="text-white text-center font-medium">
               + Add Exercise
@@ -274,28 +278,30 @@ const WorkoutSessionScreen: React.FC = () => {
           </TouchableOpacity>
 
           {/* Workout Notes */}
-          <View className="bg-white rounded-lg p-4 mb-4 shadow-sm">
-            <Text className="text-lg font-semibold text-gray-900 mb-2">
+          <View className="bg-gray-800 rounded-lg p-4 mb-4 shadow-sm">
+            <Text className="text-lg font-semibold text-gray-100 mb-2">
               Notes
             </Text>
             <TextInput
               value={workoutNotes}
               onChangeText={setWorkoutNotes}
               placeholder="Add any notes about this workout..."
+              placeholderTextColor="#9ca3af"
               multiline
               numberOfLines={3}
-              className="border border-gray-300 rounded-lg p-3 text-gray-700"
+              className="border border-gray-600 rounded-lg p-3 text-gray-200 bg-gray-700"
             />
           </View>
         </View>
       </ScrollView>
+      </KeyboardAvoidingView>
 
       {/* Bottom Action Buttons */}
-      <View className="bg-white border-t border-gray-200 p-4">
+      <View className="bg-gray-800 border-t border-gray-700 p-4">
         <View className="flex-row justify-between gap-5">
           <TouchableOpacity
             onPress={discardWorkout}
-            className="flex-1 bg-gray-500 rounded-lg py-3"
+            className="flex-1 bg-gray-600 rounded-lg py-3"
           >
             <Text className="text-white text-center font-medium">
               Delete Workout
@@ -303,7 +309,7 @@ const WorkoutSessionScreen: React.FC = () => {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={finishWorkout}
-            className="flex-1 bg-green-600 rounded-lg py-3"
+            className="flex-1 bg-teal-600 rounded-lg py-3"
           >
             <Text className="text-white text-center font-medium">
               Finish Workout
@@ -311,7 +317,6 @@ const WorkoutSessionScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
     </GestureHandlerRootView>
   );
 };

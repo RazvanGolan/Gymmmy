@@ -107,7 +107,7 @@ const ProgressScreen: React.FC = () => {
     >
       <Text className={`text-center font-medium ${
         selectedTab === tab 
-          ? 'text-blue-600' 
+          ? 'text-slate-400' 
           : 'text-gray-600'
       }`}>
         {label}
@@ -332,14 +332,14 @@ const ProgressScreen: React.FC = () => {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
+    <SafeAreaView className="flex-1 bg-gray-900">
       {/* Header */}
-      <View className="bg-white border-b border-gray-200">
+      <View className="bg-gray-800 border-b border-gray-700">
         <View className="px-4 py-4">
           <Text className="text-2xl font-bold text-gray-900">
             Progress
           </Text>
-          <Text className="text-gray-600">
+          <Text className="text-gray-300">
             Track your fitness journey
           </Text>
         </View>

@@ -62,15 +62,15 @@ function TabNavigator() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#ffffff',
+          backgroundColor: '#1f2937',
           borderTopWidth: 1,
-          borderTopColor: '#e5e7eb',
+          borderTopColor: '#374151',
           paddingBottom: 8,
           paddingTop: 8,
           height: 70,
         },
-        tabBarActiveTintColor: '#3b82f6',
-        tabBarInactiveTintColor: '#6b7280',
+        tabBarActiveTintColor: '#64748b',
+        tabBarInactiveTintColor: '#9ca3af',
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: '500',
@@ -136,6 +136,13 @@ export default function AppNavigator() {
           options={{
             headerShown: true,
             headerTitle: 'Workout Session',
+            headerStyle: {
+              backgroundColor: '#1f2937',
+            },
+            headerTintColor: '#f3f4f6',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
           }}
         />
         <Stack.Screen 

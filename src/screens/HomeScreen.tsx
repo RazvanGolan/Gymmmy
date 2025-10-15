@@ -129,19 +129,19 @@ const HomeScreen: React.FC = () => {
           {/* Quick Stats */}
           <View className="flex-row justify-between mt-6">
             <View className="items-center">
-              <Text className="text-2xl font-bold text-slate-400">
+              <Text className="text-2xl font-bold text-gray-100">
                 {totalWorkouts}
               </Text>
               <Text className="text-sm text-gray-300">Total Workouts</Text>
             </View>
             <View className="items-center">
-              <Text className="text-2xl font-bold text-teal-400">
+              <Text className="text-2xl font-bold text-gray-100">
                 {streak}
               </Text>
               <Text className="text-sm text-gray-300">Day Streak</Text>
             </View>
             <View className="items-center">
-              <Text className="text-2xl font-bold text-indigo-400">
+              <Text className="text-2xl font-bold text-gray-100">
                 {thisWeekWorkouts}
               </Text>
               <Text className="text-sm text-gray-300">This Week</Text>

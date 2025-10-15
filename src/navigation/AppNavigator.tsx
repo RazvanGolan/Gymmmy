@@ -159,6 +159,13 @@ export default function AppNavigator() {
           options={{
             headerShown: true,
             headerTitle: 'Create Template',
+            headerStyle: {
+              backgroundColor: '#1f2937',
+            },
+            headerTintColor: '#f3f4f6',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
           }}
         />
         <Stack.Screen 
@@ -175,6 +182,13 @@ export default function AppNavigator() {
           options={{
             headerShown: true,
             headerTitle: 'Add Exercise',
+            headerStyle: {
+              backgroundColor: '#1f2937',
+            },
+            headerTintColor: '#f3f4f6',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
           }}
         />
       </Stack.Navigator>

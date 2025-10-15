@@ -124,25 +124,25 @@ const TemplatesScreen: React.FC = () => {
 
       <ScrollView className="flex-1 px-4 pt-4">
         {/* Quick Stats */}
-        <View className="bg-white rounded-lg p-4 mb-4 shadow-sm">
-          <Text className="text-lg font-semibold text-gray-900 mb-3">
+        <View className="bg-gray-800 rounded-lg p-4 mb-4 shadow-sm">
+          <Text className="text-lg font-semibold text-gray-100 mb-3">
             Your Templates
           </Text>
           <View className="flex-row justify-between">
             <View className="items-center">
-              <Text className="text-2xl font-bold text-blue-600">
+              <Text className="text-2xl font-bold text-gray-100">
                 {mockTemplates.length}
               </Text>
               <Text className="text-sm text-gray-600">Templates</Text>
             </View>
             <View className="items-center">
-              <Text className="text-2xl font-bold text-green-600">
+              <Text className="text-2xl font-bold text-gray-100">
                 {mockTemplates.reduce((sum, t) => sum + t.usageCount, 0)}
               </Text>
               <Text className="text-sm text-gray-600">Uses</Text>
             </View>
             <View className="items-center">
-              <Text className="text-2xl font-bold text-purple-600">
+              <Text className="text-2xl font-bold text-gray-100">
                 {Math.round(mockTemplates.reduce((sum, t) => sum + t.estimatedDuration, 0) / mockTemplates.length)}
               </Text>
               <Text className="text-sm text-gray-600">Avg Min</Text>
@@ -158,21 +158,6 @@ const TemplatesScreen: React.FC = () => {
           showsVerticalScrollIndicator={false}
           scrollEnabled={false}
         />
-
-        {/* Popular Templates Suggestion */}
-        <View className="bg-white rounded-lg p-4 mt-4 mb-8 shadow-sm">
-          <Text className="text-lg font-semibold text-gray-900 mb-2">
-            Need Inspiration?
-          </Text>
-          <Text className="text-gray-600 mb-3">
-            Browse popular workout templates from the community
-          </Text>
-          <TouchableOpacity className="bg-gray-100 rounded-lg py-3">
-            <Text className="text-gray-700 text-center font-medium">
-              Browse Popular Templates
-            </Text>
-          </TouchableOpacity>
-        </View>
       </ScrollView>
     </SafeAreaView>
   );

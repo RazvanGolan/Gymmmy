@@ -137,31 +137,31 @@ const ProgressScreen: React.FC = () => {
   const renderOverview = () => (
     <View className="p-4">
       {/* Quick Stats */}
-      <View className="bg-white rounded-lg p-4 shadow-sm mb-4">
-        <Text className="text-lg font-semibold text-gray-900 mb-4">
+      <View className="bg-gray-800 rounded-lg p-4 shadow-sm mb-4">
+        <Text className="text-lg font-semibold text-gray-100 mb-4">
           Quick Stats
         </Text>
         <View className="flex-row justify-between">
           <View className="items-center">
-            <Text className="text-2xl font-bold text-blue-600">
+            <Text className="text-2xl font-bold text-gray-100">
               {completedWorkouts.length}
             </Text>
             <Text className="text-sm text-gray-600">Total Workouts</Text>
           </View>
           <View className="items-center">
-            <Text className="text-2xl font-bold text-green-600">
+            <Text className="text-2xl font-bold text-gray-100">
               {currentStreak}
             </Text>
             <Text className="text-sm text-gray-600">Day Streak</Text>
           </View>
           <View className="items-center">
-            <Text className="text-2xl font-bold text-purple-600">
+            <Text className="text-2xl font-bold text-gray-100">
               {thisWeekWorkouts}
             </Text>
             <Text className="text-sm text-gray-600">This Week</Text>
           </View>
           <View className="items-center">
-            <Text className="text-2xl font-bold text-orange-600">
+            <Text className="text-2xl font-bold text-gray-100">
               {thisMonthWorkouts}
             </Text>
             <Text className="text-sm text-gray-600">This Month</Text>
@@ -170,18 +170,18 @@ const ProgressScreen: React.FC = () => {
       </View>
 
       {/* Recent Progress */}
-      <View className="bg-white rounded-lg p-4 shadow-sm mb-4">
-        <Text className="text-lg font-semibold text-gray-900 mb-4">
+      <View className="bg-gray-800 rounded-lg p-4 shadow-sm mb-4">
+        <Text className="text-lg font-semibold text-gray-100 mb-4">
           Recent Progress
         </Text>
         
         {mockProgressData.length > 0 && (
           <View className="mb-4">
-            <Text className="text-sm text-gray-600 mb-2">Latest Weight</Text>
-            <Text className="text-2xl font-bold text-gray-900">
+            <Text className="text-sm text-gray-500 mb-2">Latest Weight</Text>
+            <Text className="text-2xl font-bold text-gray-100">
               {mockProgressData[mockProgressData.length - 1].weight}kg
             </Text>
-            <Text className="text-sm text-gray-600">
+            <Text className="text-sm text-gray-500">
               {format(parseISO(mockProgressData[mockProgressData.length - 1].date), 'MMM d, yyyy')}
             </Text>
           </View>
@@ -189,7 +189,7 @@ const ProgressScreen: React.FC = () => {
 
         <TouchableOpacity 
           onPress={() => setShowAddWeight(true)}
-          className="bg-blue-600 rounded-lg py-3"
+          className="bg-gray-600 rounded-lg py-3"
         >
           <Text className="text-white text-center font-medium">
             Log Weight
@@ -198,11 +198,11 @@ const ProgressScreen: React.FC = () => {
       </View>
 
       {/* Charts Placeholder */}
-      <View className="bg-white rounded-lg p-4 shadow-sm">
-        <Text className="text-lg font-semibold text-gray-900 mb-4">
+      <View className="bg-gray-800 rounded-lg p-4 shadow-sm">
+        <Text className="text-lg font-semibold text-gray-100 mb-4">
           Progress Charts
         </Text>
-        <View className="h-48 bg-gray-100 rounded-lg items-center justify-center">
+        <View className="h-48 bg-gray-700 rounded-lg items-center justify-center">
           <Text className="text-gray-500 text-lg">📊</Text>
           <Text className="text-gray-500 mt-2">Charts coming soon!</Text>
           <Text className="text-sm text-gray-400 text-center mt-1">
@@ -216,26 +216,26 @@ const ProgressScreen: React.FC = () => {
   const renderBodyProgress = () => (
     <View className="p-4">
       {/* Weight History */}
-      <View className="bg-white rounded-lg p-4 shadow-sm mb-4">
+      <View className="bg-gray-800 rounded-lg p-4 shadow-sm mb-4">
         <View className="flex-row justify-between items-center mb-4">
-          <Text className="text-lg font-semibold text-gray-900">
+          <Text className="text-lg font-semibold text-gray-100">
             Weight History
           </Text>
           <TouchableOpacity 
             onPress={() => setShowAddWeight(true)}
-            className="bg-blue-600 rounded-lg px-3 py-2"
+            className="bg-gray-600 rounded-lg px-3 py-2"
           >
-            <Text className="text-white text-sm font-medium">Add Entry</Text>
+            <Text className="text-gray-100 text-sm font-medium">Add Entry</Text>
           </TouchableOpacity>
         </View>
 
         {mockProgressData.map((entry, index) => (
           <View key={entry.date} className="flex-row justify-between items-center py-3 border-b border-gray-100 last:border-b-0">
             <View>
-              <Text className="font-medium text-gray-900">
+              <Text className="font-medium text-gray-300">
                 {entry.weight}kg
               </Text>
-              <Text className="text-sm text-gray-600">
+              <Text className="text-sm text-gray-500">
                 {format(parseISO(entry.date), 'MMM d, yyyy')}
               </Text>
             </View>
@@ -258,8 +258,8 @@ const ProgressScreen: React.FC = () => {
       </View>
 
       {/* Body Measurements */}
-      <View className="bg-white rounded-lg p-4 shadow-sm">
-        <Text className="text-lg font-semibold text-gray-900 mb-4">
+      <View className="bg-gray-800 rounded-lg p-4 shadow-sm">
+        <Text className="text-lg font-semibold text-gray-100 mb-4">
           Body Measurements
         </Text>
         <View className="items-center py-8">
@@ -275,8 +275,8 @@ const ProgressScreen: React.FC = () => {
   const renderStrengthProgress = () => (
     <View className="p-4">
       {/* Exercise Progress */}
-      <View className="bg-white rounded-lg p-4 shadow-sm mb-4">
-        <Text className="text-lg font-semibold text-gray-900 mb-4">
+      <View className="bg-gray-800 rounded-lg p-4 shadow-sm mb-4">
+        <Text className="text-lg font-semibold text-gray-100 mb-4">
           Strength Progress
         </Text>
         
@@ -293,10 +293,10 @@ const ProgressScreen: React.FC = () => {
             >
               <View className="flex-row justify-between items-start">
                 <View className="flex-1">
-                  <Text className="font-medium text-gray-900 mb-1">
+                  <Text className="font-medium text-gray-300 mb-1">
                     {exercise.exercise}
                   </Text>
-                  <Text className="text-sm text-gray-600">
+                  <Text className="text-sm text-gray-500">
                     Latest: {latest.weight}kg × {latest.reps}
                   </Text>
                   {improvement !== 0 && (
@@ -307,7 +307,7 @@ const ProgressScreen: React.FC = () => {
                     </Text>
                   )}
                 </View>
-                <Text className="text-blue-600 text-sm font-medium">
+                <Text className="text-gray-600 text-sm font-medium">
                   View History →
                 </Text>
               </View>
@@ -317,8 +317,8 @@ const ProgressScreen: React.FC = () => {
       </View>
 
       {/* Personal Records */}
-      <View className="bg-white rounded-lg p-4 shadow-sm">
-        <Text className="text-lg font-semibold text-gray-900 mb-4">
+      <View className="bg-gray-800 rounded-lg p-4 shadow-sm">
+        <Text className="text-lg font-semibold text-gray-100 mb-4">
           Personal Records
         </Text>
         <View className="items-center py-8">
@@ -336,7 +336,7 @@ const ProgressScreen: React.FC = () => {
       {/* Header */}
       <View className="bg-gray-800 border-b border-gray-700">
         <View className="px-4 py-4">
-          <Text className="text-2xl font-bold text-gray-900">
+          <Text className="text-2xl font-bold text-gray-100">
             Progress
           </Text>
           <Text className="text-gray-300">

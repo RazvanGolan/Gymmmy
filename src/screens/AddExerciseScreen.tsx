@@ -36,6 +36,8 @@ const AddExerciseScreen: React.FC = () => {
       ]
     };
     
+    (global as any).selectedExercise = newExercise;
+    
     onSelectExercise(newExercise);
     navigation.goBack();
   };

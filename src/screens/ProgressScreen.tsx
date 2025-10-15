@@ -101,7 +101,7 @@ const ProgressScreen: React.FC = () => {
       onPress={() => setSelectedTab(tab)}
       className={`flex-1 py-3 ${
         selectedTab === tab 
-          ? 'border-b-2 border-blue-600' 
+          ? 'border-b-2 border-gray-600' 
           : 'border-b border-gray-200'
       }`}
     >
@@ -120,7 +120,7 @@ const ProgressScreen: React.FC = () => {
       onPress={() => setSelectedPeriod(period)}
       className={`px-3 py-2 rounded-lg ${
         selectedPeriod === period 
-          ? 'bg-blue-600' 
+          ? 'bg-gray-600' 
           : 'bg-gray-200'
       }`}
     >
@@ -360,9 +360,9 @@ const ProgressScreen: React.FC = () => {
 
       {/* Add Weight Modal */}
       {showAddWeight && (
-        <View className="absolute inset-0 bg-black bg-opacity-50 items-center justify-center">
-          <View className="bg-white rounded-lg p-6 mx-4 w-full max-w-sm">
-            <Text className="text-lg font-semibold text-gray-900 mb-4">
+        <View className="absolute inset-0 items-center justify-center">
+          <View className="bg-gray-300 rounded-lg p-6 mx-4 w-full max-w-sm">
+            <Text className="text-lg font-semibold text-gray-800 mb-4">
               Log Weight
             </Text>
             <TextInput
@@ -370,9 +370,9 @@ const ProgressScreen: React.FC = () => {
               onChangeText={setNewWeight}
               placeholder="Enter weight (kg)"
               keyboardType="numeric"
-              className="border border-gray-300 rounded-lg p-3 mb-4"
+              className="border border-gray-400 rounded-lg p-3 mb-4"
             />
-            <View className="flex-row space-x-3">
+            <View className="flex-row gap-4">
               <TouchableOpacity
                 onPress={() => setShowAddWeight(false)}
                 className="flex-1 bg-gray-200 rounded-lg py-3"
@@ -383,7 +383,7 @@ const ProgressScreen: React.FC = () => {
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleAddWeight}
-                className="flex-1 bg-blue-600 rounded-lg py-3"
+                className="flex-1 bg-gray-600 rounded-lg py-3"
               >
                 <Text className="text-white text-center font-medium">
                   Save

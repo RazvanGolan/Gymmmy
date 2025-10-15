@@ -18,10 +18,10 @@ type NavigationProp = CompositeNavigationProp<
 
 const HomeScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
-  const { workouts, getWorkoutStreak, getCalendarData } = useWorkoutStore();
+  const { workouts, getWorkoutStreak } = useWorkoutStore();
   const { templates, loadDefaultExercises } = useTemplateStore();
   
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
   const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
 
   useEffect(() => {
@@ -71,13 +71,10 @@ const HomeScreen: React.FC = () => {
   }
 
   const handleDateSelect = (day: DateData) => {
-    setSelectedDate(selectedDate === day.dateString ? null : day.dateString);
-  };
-
-  const handleStartWorkout = (templateId?: string) => {
-    const today = format(new Date(), 'yyyy-MM-dd');
+    setSelectedDate(day.dateString);
+  };  const handleStartWorkout = (templateId?: string) => {
     navigation.navigate('WorkoutSession', { 
-      date: selectedDate || today,
+      date: selectedDate,
       templateId,
     });
   };
@@ -90,7 +87,7 @@ const HomeScreen: React.FC = () => {
     (navigation as any).navigate('Workout');
   };
 
-  const selectedDateWorkouts = selectedDate ? workouts.filter(w => w.date === selectedDate) : [];
+  const selectedDateWorkouts = workouts.filter(w => w.date === selectedDate);
   const recentWorkouts = workouts
     .filter(w => w.completed)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
@@ -245,9 +242,8 @@ const HomeScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* Selected Date Actions - Only show when date is selected */}
-        {selectedDate && (
-          <View className="bg-gray-800 mx-4 mt-4 rounded-lg shadow-sm">
+        {/* Selected Date Actions */}
+        <View className="bg-gray-800 mx-4 mt-4 rounded-lg shadow-sm">
             <View className="p-4 border-b border-gray-700">
               <Text className="text-lg font-semibold text-gray-100">
                 {format(parseISO(selectedDate), 'EEEE, MMMM d')}
@@ -325,7 +321,6 @@ const HomeScreen: React.FC = () => {
               </View>
             )}
           </View>
-        )}
 
         {/* Recent Workouts */}
         {recentWorkouts.length > 0 && (

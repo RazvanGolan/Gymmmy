@@ -2,6 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 // Screens
 import HomeScreen from '../screens/HomeScreen';
@@ -82,7 +83,9 @@ function TabNavigator() {
         component={HomeScreen}
         options={{
           tabBarLabel: 'Calendar',
-          // TODO: Add icon when vector icons are properly set up
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="calendar-today" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen 
@@ -90,7 +93,9 @@ function TabNavigator() {
         component={WorkoutScreen}
         options={{
           tabBarLabel: 'Workout',
-          // TODO: Add icon when vector icons are properly set up
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="fitness-center" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen 
@@ -98,7 +103,9 @@ function TabNavigator() {
         component={TemplatesScreen}
         options={{
           tabBarLabel: 'Templates',
-          // TODO: Add icon when vector icons are properly set up
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="turned-in-not" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen 
@@ -106,7 +113,9 @@ function TabNavigator() {
         component={ProgressScreen}
         options={{
           tabBarLabel: 'Progress',
-          // TODO: Add icon when vector icons are properly set up
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="trending-up" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen 
@@ -114,7 +123,9 @@ function TabNavigator() {
         component={ProfileScreen}
         options={{
           tabBarLabel: 'Profile',
-          // TODO: Add icon when vector icons are properly set up
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="person" size={size} color={color} />
+          ),
         }}
       />
     </Tab.Navigator>
@@ -174,6 +185,13 @@ export default function AppNavigator() {
           options={{
             headerShown: true,
             headerTitle: 'Statistics',
+            headerStyle: {
+              backgroundColor: '#1f2937',
+            },
+            headerTintColor: '#f3f4f6',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
           }}
         />
         <Stack.Screen 

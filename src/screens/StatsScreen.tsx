@@ -47,13 +47,13 @@ const StatsScreen: React.FC = () => {
       className={`px-4 py-2 rounded-lg ${
         selectedPeriod === period 
           ? 'bg-slate-600' 
-          : 'bg-gray-200'
+          : 'bg-gray-700'
       }`}
     >
       <Text className={`font-medium ${
         selectedPeriod === period 
           ? 'text-white' 
-          : 'text-gray-700'
+          : 'text-gray-300'
       }`}>
         {label}
       </Text>
@@ -68,22 +68,22 @@ const StatsScreen: React.FC = () => {
           <Text className="text-2xl font-bold text-gray-100 mb-2">
             Your Statistics
           </Text>
-          <Text className="text-gray-600">
+          <Text className="text-gray-300">
             Track your fitness journey progress
           </Text>
         </View>
 
         {/* Period Selection */}
-        <View className="flex-row justify-center gap-5 py-4 bg-white mx-4 mt-4 rounded-lg shadow-sm">
+        <View className="flex-row justify-center gap-5 py-4 bg-gray-800 mx-4 mt-4 rounded-lg shadow-sm">
           <PeriodButton period="week" label="This Week" />
           <PeriodButton period="month" label="This Month" />
           <PeriodButton period="year" label="All Time" />
         </View>
 
         {/* Overall Stats */}
-        <View className="bg-white mx-4 mt-4 rounded-lg shadow-sm">
-          <View className="p-4 border-b border-gray-100">
-            <Text className="text-lg font-semibold text-gray-900">
+        <View className="bg-gray-800 mx-4 mt-4 rounded-lg shadow-sm">
+          <View className="p-4 border-b border-gray-700">
+            <Text className="text-lg font-semibold text-gray-100">
               Overall Statistics
             </Text>
           </View>
@@ -91,34 +91,34 @@ const StatsScreen: React.FC = () => {
             <View className="flex-row flex-wrap justify-between">
               <View className="w-1/2 mb-4">
                 <View className="items-center">
-                  <Text className="text-2xl font-bold text-blue-600">
+                  <Text className="text-2xl font-bold text-gray-100">
                     {mockStats.totalWorkouts}
                   </Text>
-                  <Text className="text-sm text-gray-600">Total Workouts</Text>
+                  <Text className="text-sm text-gray-300">Total Workouts</Text>
                 </View>
               </View>
               <View className="w-1/2 mb-4">
                 <View className="items-center">
-                  <Text className="text-2xl font-bold text-teal-400">
+                  <Text className="text-2xl font-bold text-gray-100">
                     {formatDuration(mockStats.totalDuration)}
                   </Text>
-                  <Text className="text-sm text-gray-600">Total Time</Text>
+                  <Text className="text-sm text-gray-300">Total Time</Text>
                 </View>
               </View>
               <View className="w-1/2 mb-4">
                 <View className="items-center">
-                  <Text className="text-2xl font-bold text-indigo-400">
+                  <Text className="text-2xl font-bold text-gray-100">
                     {mockStats.totalSets}
                   </Text>
-                  <Text className="text-sm text-gray-600">Total Sets</Text>
+                  <Text className="text-sm text-gray-300">Total Sets</Text>
                 </View>
               </View>
               <View className="w-1/2 mb-4">
                 <View className="items-center">
-                  <Text className="text-2xl font-bold text-amber-400">
+                  <Text className="text-2xl font-bold text-gray-100">
                     {mockStats.totalReps.toLocaleString()}
                   </Text>
-                  <Text className="text-sm text-gray-600">Total Reps</Text>
+                  <Text className="text-sm text-gray-300">Total Reps</Text>
                 </View>
               </View>
             </View>
@@ -126,9 +126,9 @@ const StatsScreen: React.FC = () => {
         </View>
 
         {/* Streak Stats */}
-        <View className="bg-white mx-4 mt-4 rounded-lg shadow-sm">
-          <View className="p-4 border-b border-gray-100">
-            <Text className="text-lg font-semibold text-gray-900">
+        <View className="bg-gray-800 mx-4 mt-4 rounded-lg shadow-sm">
+          <View className="p-4 border-b border-gray-700">
+            <Text className="text-lg font-semibold text-gray-100">
               Workout Streaks
             </Text>
           </View>
@@ -138,49 +138,49 @@ const StatsScreen: React.FC = () => {
                 <Text className="text-3xl font-bold text-red-500">
                   🔥
                 </Text>
-                <Text className="text-2xl font-bold text-gray-900 mt-1">
+                <Text className="text-2xl font-bold text-gray-100 mt-1">
                   {mockStats.currentStreak}
                 </Text>
-                <Text className="text-sm text-gray-600">Current Streak</Text>
+                <Text className="text-sm text-gray-300">Current Streak</Text>
               </View>
               <View className="items-center">
                 <Text className="text-3xl font-bold text-yellow-500">
                   🏆
                 </Text>
-                <Text className="text-2xl font-bold text-gray-900 mt-1">
+                <Text className="text-2xl font-bold text-gray-100 mt-1">
                   {mockStats.longestStreak}
                 </Text>
-                <Text className="text-sm text-gray-600">Longest Streak</Text>
+                <Text className="text-sm text-gray-300">Longest Streak</Text>
               </View>
               <View className="items-center">
-                <Text className="text-3xl font-bold text-blue-500">
+                <Text className="text-3xl font-bold text-slate-500">
                   ⏱️
                 </Text>
-                <Text className="text-2xl font-bold text-gray-900 mt-1">
+                <Text className="text-2xl font-bold text-gray-100 mt-1">
                   {mockStats.averageWorkoutDuration}
                 </Text>
-                <Text className="text-sm text-gray-600">Avg Duration</Text>
+                <Text className="text-sm text-gray-300">Avg Duration</Text>
               </View>
             </View>
           </View>
         </View>
 
         {/* Weekly Comparison */}
-        <View className="bg-white mx-4 mt-4 rounded-lg shadow-sm">
-          <View className="p-4 border-b border-gray-100">
-            <Text className="text-lg font-semibold text-gray-900">
+        <View className="bg-gray-800 mx-4 mt-4 rounded-lg shadow-sm">
+          <View className="p-4 border-b border-gray-700">
+            <Text className="text-lg font-semibold text-gray-100">
               Weekly Progress
             </Text>
           </View>
           <View className="p-4">
             <View className="flex-row justify-between mb-4">
-              <Text className="text-sm text-gray-600 font-medium">This Week</Text>
-              <Text className="text-sm text-gray-600 font-medium">Last Week</Text>
+              <Text className="text-sm text-gray-300 font-medium">This Week</Text>
+              <Text className="text-sm text-gray-300 font-medium">Last Week</Text>
             </View>
             
             <View className="space-y-3">
               <View className="flex-row justify-between items-center">
-                <Text className="text-gray-700">Workouts</Text>
+                <Text className="text-gray-200">Workouts</Text>
                 <View className="flex-row space-x-8">
                   <Text className="text-lg font-semibold text-green-600">
                     {mockStats.thisWeek.workouts}
@@ -192,9 +192,9 @@ const StatsScreen: React.FC = () => {
               </View>
               
               <View className="flex-row justify-between items-center">
-                <Text className="text-gray-700">Duration</Text>
+                <Text className="text-gray-200">Duration</Text>
                 <View className="flex-row space-x-8">
-                  <Text className="text-lg font-semibold text-green-600">
+                  <Text className="text-lg font-semibold text-teal-400">
                     {formatDuration(mockStats.thisWeek.duration)}
                   </Text>
                   <Text className="text-lg font-semibold text-gray-400">
@@ -204,9 +204,9 @@ const StatsScreen: React.FC = () => {
               </View>
               
               <View className="flex-row justify-between items-center">
-                <Text className="text-gray-700">Sets</Text>
+                <Text className="text-gray-200">Sets</Text>
                 <View className="flex-row space-x-8">
-                  <Text className="text-lg font-semibold text-green-600">
+                  <Text className="text-lg font-semibold text-teal-400">
                     {mockStats.thisWeek.sets}
                   </Text>
                   <Text className="text-lg font-semibold text-gray-400">
@@ -216,9 +216,9 @@ const StatsScreen: React.FC = () => {
               </View>
               
               <View className="flex-row justify-between items-center">
-                <Text className="text-gray-700">Volume</Text>
+                <Text className="text-gray-200">Volume</Text>
                 <View className="flex-row space-x-8">
-                  <Text className="text-lg font-semibold text-green-600">
+                  <Text className="text-lg font-semibold text-teal-400">
                     {mockStats.thisWeek.volume}kg
                   </Text>
                   <Text className="text-lg font-semibold text-gray-400">
@@ -231,9 +231,9 @@ const StatsScreen: React.FC = () => {
         </View>
 
         {/* Favorite Exercises */}
-        <View className="bg-white mx-4 mt-4 rounded-lg shadow-sm">
-          <View className="p-4 border-b border-gray-100">
-            <Text className="text-lg font-semibold text-gray-900">
+        <View className="bg-gray-800 mx-4 mt-4 rounded-lg shadow-sm">
+          <View className="p-4 border-b border-gray-700">
+            <Text className="text-lg font-semibold text-gray-100">
               Most Performed Exercises
             </Text>
           </View>
@@ -241,16 +241,16 @@ const StatsScreen: React.FC = () => {
             {mockStats.favoriteExercises.map((exercise, index) => (
               <View key={index} className="flex-row justify-between items-center mb-3">
                 <View className="flex-row items-center">
-                  <View className="w-6 h-6 bg-blue-600 rounded-full items-center justify-center mr-3">
+                  <View className="w-6 h-6 bg-slate-600 rounded-full items-center justify-center mr-3">
                     <Text className="text-white text-xs font-bold">
                       {index + 1}
                     </Text>
                   </View>
-                  <Text className="text-gray-900 font-medium">
+                  <Text className="text-gray-100 font-medium">
                     {exercise.name}
                   </Text>
                 </View>
-                <Text className="text-gray-600">
+                <Text className="text-gray-300">
                   {exercise.count} times
                 </Text>
               </View>
@@ -259,16 +259,16 @@ const StatsScreen: React.FC = () => {
         </View>
 
         {/* Progress Chart Placeholder */}
-        <View className="bg-white mx-4 mt-4 mb-8 rounded-lg shadow-sm">
-          <View className="p-4 border-b border-gray-100">
-            <Text className="text-lg font-semibold text-gray-900">
+        <View className="bg-gray-800 mx-4 mt-4 mb-8 rounded-lg shadow-sm">
+          <View className="p-4 border-b border-gray-700">
+            <Text className="text-lg font-semibold text-gray-100">
               Progress Over Time
             </Text>
           </View>
           <View className="p-4">
-            <View className="h-48 bg-gray-100 rounded-lg items-center justify-center">
-              <Text className="text-gray-500 text-lg">📊</Text>
-              <Text className="text-gray-500 mt-2">Charts coming soon!</Text>
+            <View className="h-48 bg-gray-700 rounded-lg items-center justify-center">
+              <Text className="text-gray-400 text-lg">📊</Text>
+              <Text className="text-gray-300 mt-2">Charts coming soon!</Text>
               <Text className="text-sm text-gray-400 text-center mt-1">
                 Workout frequency, volume, and strength progression charts
               </Text>

@@ -4,14 +4,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { useWorkoutsData } from '../hooks/useWorkoutsData';
 import { useTemplatesData } from '../hooks/useTemplatesData';
+import { useTheme } from '../contexts/ThemeContext';
 import { databaseService } from '../services/database';
 
 const ProfileScreen: React.FC = () => {
   const navigation = useNavigation();
   const { workouts, getWorkoutStreak } = useWorkoutsData();
   const { templates } = useTemplatesData();
+  const { toggleTheme, isDark } = useTheme();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [darkModeEnabled, setDarkModeEnabled] = useState(true);
   const [targetWeight, setTargetWeight] = useState<number | null>(null);
   const [showTargetWeightModal, setShowTargetWeightModal] = useState(false);
   const [newTargetWeight, setNewTargetWeight] = useState('');
@@ -27,7 +28,6 @@ const ProfileScreen: React.FC = () => {
       if (result.success && result.data) {
         setTargetWeight(result.data.targetWeight);
         setNotificationsEnabled(result.data.notificationsEnabled);
-        setDarkModeEnabled(result.data.darkModeEnabled);
       }
     } catch (error) {
       console.error('Failed to load user settings:', error);
@@ -94,75 +94,75 @@ const ProfileScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-900">
+    <SafeAreaView className={`flex-1 ${isDark ? 'bg-dark-background' : 'bg-light-background'}`} edges={['top']}>
       <ScrollView className="flex-1">
         {/* Header */}
-        <View className="bg-gray-800 px-4 py-6 border-b border-gray-700">
+        <View className={`px-4 py-6 border-b ${isDark ? 'bg-dark-surface border-dark-border' : 'bg-light-surface border-light-border'}`}>
           <View className="items-center">
-            <View className="w-20 h-20 bg-slate-600 rounded-full items-center justify-center mb-3">
-              <Text className="text-white text-3xl font-bold">
+            <View className="w-20 h-20 rounded-full items-center justify-center mb-3 bg-primary">
+              <Text className={`text-3xl font-bold ${isDark ? 'text-gray-900' : 'text-white'}`}>
                 💪
               </Text>
             </View>
-            <Text className="text-xl font-bold text-gray-100">
+            <Text className={`text-xl font-bold ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
               Gymmy
             </Text>
-            <Text className="text-gray-400">
+            <Text className={`${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'}`}>
               Your Personal Fitness Tracker
             </Text>
           </View>
         </View>
 
         {/* Stats Section */}
-        <View className="bg-gray-800 mx-4 mt-4 rounded-lg p-4 shadow-sm">
-          <Text className="text-lg font-semibold text-gray-100 mb-4">
+        <View className={`mx-4 mt-4 rounded-lg p-4 shadow-sm ${isDark ? 'bg-dark-surface' : 'bg-light-surface'}`}>
+          <Text className={`text-lg font-semibold mb-4 ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
             Your Progress
           </Text>
           <View className="flex-row justify-between">
             <View className="items-center">
-              <Text className="text-2xl font-bold text-gray-100">
+              <Text className={`text-2xl font-bold ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
                 {workouts.filter(w => w.completed).length}
               </Text>
-              <Text className="text-sm text-gray-400">Workouts</Text>
+              <Text className={`text-sm ${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'}`}>Workouts</Text>
             </View>
             <View className="items-center">
-              <Text className="text-2xl font-bold text-gray-100">
+              <Text className={`text-2xl font-bold ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
                 {templates.length}
               </Text>
-              <Text className="text-sm text-gray-400">Templates</Text>
+              <Text className={`text-sm ${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'}`}>Templates</Text>
             </View>
             <View className="items-center">
-              <Text className="text-2xl font-bold text-gray-100">
+              <Text className={`text-2xl font-bold ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
                 {getWorkoutStreak()}
               </Text>
-              <Text className="text-sm text-gray-400">Day Streak</Text>
+              <Text className={`text-sm ${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'}`}>Day Streak</Text>
             </View>
           </View>
         </View>
 
         {/* Settings Section */}
-        <View className="bg-gray-800 mx-4 mt-4 rounded-lg p-4 shadow-sm">
-          <Text className="text-lg font-semibold text-gray-100 mb-4">
+        <View className={`mx-4 mt-4 rounded-lg p-4 shadow-sm ${isDark ? 'bg-dark-surface' : 'bg-light-surface'}`}>
+          <Text className={`text-lg font-semibold mb-4 ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
             Settings
           </Text>
           
-          <View className="flex-row justify-between items-center py-3 border-b border-gray-700">
-            <Text className="text-gray-200 font-medium">Notifications</Text>
+          <View className={`flex-row justify-between items-center py-3 border-b ${isDark ? 'border-dark-border' : 'border-light-border'}`}>
+            <Text className={`font-medium ${isDark ? 'text-dark-text' : 'text-light-text'}`}>Notifications</Text>
             <Switch
               value={notificationsEnabled}
               onValueChange={setNotificationsEnabled}
-              trackColor={{ false: '#374151', true: '#6366f1' }}
-              thumbColor={notificationsEnabled ? '#ffffff' : '#9ca3af'}
+              trackColor={{ false: isDark ? '#374151' : '#e2e8f0', true: '#10d6bf' }}
+              thumbColor={notificationsEnabled ? '#ffffff' : (isDark ? '#9ca3af' : '#64748b')}
             />
           </View>
           
-          <View className="flex-row justify-between items-center py-3 border-b border-gray-700">
-            <Text className="text-gray-200 font-medium">Dark Mode</Text>
+          <View className={`flex-row justify-between items-center py-3 border-b ${isDark ? 'border-dark-border' : 'border-light-border'}`}>
+            <Text className={`font-medium ${isDark ? 'text-dark-text' : 'text-light-text'}`}>Dark Mode</Text>
             <Switch
-              value={darkModeEnabled}
-              onValueChange={setDarkModeEnabled}
-              trackColor={{ false: '#374151', true: '#6366f1' }}
-              thumbColor={darkModeEnabled ? '#ffffff' : '#9ca3af'}
+              value={isDark}
+              onValueChange={toggleTheme}
+              trackColor={{ false: isDark ? '#374151' : '#e2e8f0', true: '#10d6bf' }}
+              thumbColor={isDark ? '#ffffff' : '#64748b'}
             />
           </View>
           
@@ -171,59 +171,65 @@ const ProfileScreen: React.FC = () => {
             className="flex-row justify-between items-center py-3"
           >
             <View>
-              <Text className="text-gray-200 font-medium">Target Weight</Text>
-              <Text className="text-gray-500 text-sm">
+              <Text className={`font-medium ${isDark ? 'text-dark-text' : 'text-light-text'}`}>Target Weight</Text>
+              <Text className={`text-sm ${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'}`}>
                 {targetWeight ? `${targetWeight}kg` : 'Not set'}
               </Text>
             </View>
-            <Text className="text-gray-500">→</Text>
+            <Text className={`${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'}`}>→</Text>
           </TouchableOpacity>
         </View>
 
         {/* Data Management Section */}
-        <View className="bg-gray-800 mx-4 mt-4 rounded-lg p-4 shadow-sm">
-          <Text className="text-lg font-semibold text-gray-100 mb-4">
+        <View className={`mx-4 mt-4 rounded-lg p-4 shadow-sm ${isDark ? 'bg-dark-surface' : 'bg-light-surface'}`}>
+          <Text className={`text-lg font-semibold mb-4 ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
             Data Management
           </Text>
           
           <TouchableOpacity 
             onPress={handleExportData}
-            className="flex-row justify-between items-center py-3 border-b border-gray-700"
+            className={`flex-row justify-between items-center py-3 border-b ${
+              isDark ? 'border-dark-border' : 'border-light-border'
+            }`}
           >
-            <Text className="text-gray-200 font-medium">Export Data</Text>
-            <Text className="text-gray-500">→</Text>
+            <Text className={`font-medium ${isDark ? 'text-dark-text' : 'text-light-text'}`}>Export Data</Text>
+            <Text className={`${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'}`}>→</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
             onPress={handleImportData}
-            className="flex-row justify-between items-center py-3 border-b border-gray-700"
+            className={`flex-row justify-between items-center py-3 border-b ${
+              isDark ? 'border-dark-border' : 'border-light-border'
+            }`}
           >
-            <Text className="text-gray-200 font-medium">Import Data</Text>
-            <Text className="text-gray-500">→</Text>
+            <Text className={`font-medium ${isDark ? 'text-dark-text' : 'text-light-text'}`}>Import Data</Text>
+            <Text className={`${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'}`}>→</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
             onPress={handleResetDatabase}
             className="flex-row justify-between items-center py-3"
           >
-            <Text className="text-red-400 font-medium">Reset All Data</Text>
+            <Text className="font-medium text-red-400">Reset All Data</Text>
             <Text className="text-red-400">⚠️</Text>
           </TouchableOpacity>
         </View>
 
         {/* App Info Section */}
-        <View className="bg-gray-800 mx-4 mt-4 rounded-lg p-4 shadow-sm mb-8">
-          <Text className="text-lg font-semibold text-gray-100 mb-4">
+        <View className={`mx-4 mt-4 rounded-lg p-4 shadow-sm mb-8 ${isDark ? 'bg-dark-surface' : 'bg-light-surface'}`}>
+          <Text className={`text-lg font-semibold mb-4 ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
             About
           </Text>
           
           <View className="py-2">
-            <Text className="text-gray-400 text-sm">Version</Text>
-            <Text className="text-gray-200 font-medium">1.0.0</Text>
+            <Text className={`text-sm ${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'}`}>Version</Text>
+            <Text className={`font-medium ${isDark ? 'text-dark-text' : 'text-light-text'}`}>1.0.0</Text>
           </View>
           
-          <TouchableOpacity className="mt-4 py-3 border-t border-gray-700">
-            <Text className="text-gray-300 font-medium text-center">Help & Support</Text>
+          <TouchableOpacity className={`mt-4 py-3 border-t ${
+            isDark ? 'border-dark-border' : 'border-light-border'
+          }`}>
+            <Text className={`font-medium text-center ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>Help & Support</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -231,8 +237,8 @@ const ProfileScreen: React.FC = () => {
       {/* Target Weight Modal */}
       {showTargetWeightModal && (
         <View className="absolute inset-0 bg-black bg-opacity-50 items-center justify-center">
-          <View className="bg-gray-800 rounded-lg p-6 mx-4 w-full max-w-sm">
-            <Text className="text-lg font-semibold text-gray-100 mb-4">
+          <View className={`rounded-lg p-6 mx-4 w-full max-w-sm ${isDark ? 'bg-dark-surface' : 'bg-light-background'}`}>
+            <Text className={`text-lg font-semibold mb-4 ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
               Set Target Weight
             </Text>
             <TextInput
@@ -240,26 +246,36 @@ const ProfileScreen: React.FC = () => {
               onChangeText={setNewTargetWeight}
               placeholder="Enter target weight (kg)"
               keyboardType="numeric"
-              className="border border-gray-600 rounded-lg p-3 mb-4 text-gray-200 bg-gray-700"
-              placeholderTextColor="#9ca3af"
+              className={`border rounded-lg p-3 mb-4 ${
+                isDark 
+                  ? 'border-dark-border text-dark-text bg-dark-surface-secondary' 
+                  : 'border-light-border text-light-text bg-light-surface-secondary'
+              }`}
+              placeholderTextColor={isDark ? '#9ca3af' : '#64748b'}
             />
-            <Text className="text-gray-400 text-sm mb-4">
+            <Text className={`text-sm mb-4 ${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'}`}>
               Leave empty to remove target weight
             </Text>
             <View className="flex-row gap-4">
               <TouchableOpacity
                 onPress={() => setShowTargetWeightModal(false)}
-                className="flex-1 bg-gray-600 rounded-lg py-3"
+                className={`flex-1 rounded-lg py-3 ${
+                  isDark ? 'bg-dark-surface-secondary' : 'bg-light-surface-secondary'
+                }`}
               >
-                <Text className="text-gray-200 text-center font-medium">
+                <Text className={`text-center font-medium ${
+                  isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'
+                }`}>
                   Cancel
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleSaveTargetWeight}
-                className="flex-1 bg-slate-600 rounded-lg py-3"
+                className="flex-1 rounded-lg py-3 bg-primary"
               >
-                <Text className="text-white text-center font-medium">
+                <Text className={`text-center font-medium ${
+                  isDark ? 'text-gray-900' : 'text-white'
+                }`}>
                   Save
                 </Text>
               </TouchableOpacity>

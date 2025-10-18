@@ -14,6 +14,7 @@ import { useTemplateActions } from '../hooks/useTemplateActions';
 import { useExerciseActions } from '../hooks/useExerciseActions';
 import { useWorkoutActions } from '../hooks/useWorkoutActions';
 import { databaseService } from '../services/database';
+import { useTheme } from '../contexts/ThemeContext';
 
 type NavigationProp = CompositeNavigationProp<
   StackNavigationProp<RootStackParamList>,
@@ -27,6 +28,7 @@ const HomeScreen: React.FC = () => {
   const { loadTemplates } = useTemplateActions();
   const { loadExercises } = useExerciseActions();
   const { loadWorkouts } = useWorkoutActions();
+  const { isDark } = useTheme();
   
   const [selectedDate, setSelectedDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
   const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
@@ -121,71 +123,72 @@ const HomeScreen: React.FC = () => {
   }).length;
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-900">
+    <SafeAreaView className={`flex-1 ${isDark ? 'bg-dark-background' : 'bg-light-background'}`} edges={['top']}>
       <ScrollView className="flex-1">
+        <View className="pb-4">
         {/* Header */}
-        <View className="bg-gray-800 px-4 py-6 border-b border-gray-700">
+        <View className={`px-4 py-6 border-b ${isDark ? 'bg-dark-surface border-dark-border' : 'bg-light-surface border-light-border'}`}>
           <View className="flex-row justify-between items-center">
             <View>
-              <Text className="text-2xl font-bold text-gray-100">
+              <Text className={`text-2xl font-bold ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
                 Welcome back!
               </Text>
-              <Text className="text-gray-300 mt-1">
+              <Text className={`${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'} mt-1`}>
                 Ready for your next workout?
               </Text>
             </View>
             <TouchableOpacity
               onPress={handleViewStats}
-              className="bg-slate-600 rounded-lg px-4 py-2"
+              className="bg-primary rounded-lg px-4 py-2"
             >
-              <Text className="text-white font-medium">Stats</Text>
+              <Text className={`${isDark ? 'text-gray-900' : 'text-white'} font-medium`}>Stats</Text>
             </TouchableOpacity>
           </View>
 
           {/* Quick Stats */}
           <View className="flex-row justify-between mt-6">
             <View className="items-center">
-              <Text className="text-2xl font-bold text-gray-100">
+              <Text className={`text-2xl font-bold ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
                 {totalWorkouts}
               </Text>
-              <Text className="text-sm text-gray-300">Total Workouts</Text>
+              <Text className={`text-sm ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>Total Workouts</Text>
             </View>
             <View className="items-center">
-              <Text className="text-2xl font-bold text-gray-100">
+              <Text className={`text-2xl font-bold ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
                 {streak}
               </Text>
-              <Text className="text-sm text-gray-300">Day Streak</Text>
+              <Text className={`text-sm ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>Day Streak</Text>
             </View>
             <View className="items-center">
-              <Text className="text-2xl font-bold text-gray-100">
+              <Text className={`text-2xl font-bold ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
                 {thisWeekWorkouts}
               </Text>
-              <Text className="text-sm text-gray-300">This Week</Text>
+              <Text className={`text-sm ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>This Week</Text>
             </View>
           </View>
         </View>
 
         {/* Calendar - 2 Week View */}
-        <View className="bg-gray-800 mx-4 mt-4 rounded-lg shadow-sm">
-          <View className="p-4 border-b border-gray-700">
+        <View className={`mx-4 mt-4 rounded-lg shadow-sm ${isDark ? 'bg-dark-surface' : 'bg-light-surface'}`}>
+          <View className={`p-4 border-b ${isDark ? 'border-dark-border' : 'border-light-border'}`}>
             <View className="flex-row justify-between items-center">
               <View>
-                <Text className="text-lg font-semibold text-gray-100">
+                <Text className={`text-lg font-semibold ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
                   Workout Calendar
                 </Text>
               </View>
               <View className="flex-row">
                 <TouchableOpacity
                   onPress={() => setCurrentWeekStart(addWeeks(currentWeekStart, -1))}
-                  className="p-2 mr-3 bg-gray-700 rounded-lg"
+                  className={`p-2 mr-3 rounded-lg ${isDark ? 'bg-dark-surface-secondary' : 'bg-light-surface-secondary'}`}
                 >
-                  <Text className="text-gray-300 font-size-500 font-bold">&lt;</Text>
+                  <Text className={`${isDark ? 'text-dark-text' : 'text-light-text'} font-size-500 font-bold`}>&lt;</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => setCurrentWeekStart(addWeeks(currentWeekStart, 1))}
-                  className="p-2 bg-gray-700 rounded-lg"
+                  className={`p-2 rounded-lg ${isDark ? 'bg-dark-surface-secondary' : 'bg-light-surface-secondary'}`}
                 >
-                  <Text className="text-gray-300 font-bold">&gt;</Text>
+                  <Text className={`${isDark ? 'text-dark-text' : 'text-light-text'} font-bold`}>&gt;</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -195,7 +198,7 @@ const HomeScreen: React.FC = () => {
             {/* Week days header */}
             <View className="flex-row justify-between mb-4">
               {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
-                <Text key={day} className="text-xs font-medium text-gray-400 text-center w-10">
+                <Text key={day} className={`text-xs font-medium text-center w-10 ${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'}`}>
                   {day}
                 </Text>
               ))}
@@ -214,16 +217,16 @@ const HomeScreen: React.FC = () => {
                     key={dateString}
                     onPress={() => handleDateSelect({ dateString } as DateData)}
                     className={`w-10 h-10 rounded-lg items-center justify-center ${
-                      isSelected ? 'bg-slate-600' : isToday ? 'bg-slate-700' : 'bg-transparent'
+                      isSelected ? 'bg-primary' : isToday ? (isDark ? 'bg-dark-surface-secondary' : 'bg-light-surface-secondary') : 'bg-transparent'
                     }`}
                   >
                     <Text className={`text-base font-medium ${
-                      isSelected ? 'text-white' : isToday ? 'text-slate-300' : 'text-gray-200'
+                      isSelected ? (isDark ? 'text-gray-900' : 'text-white') : isToday ? (isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary') : (isDark ? 'text-dark-text' : 'text-light-text')
                     }`}>
                       {format(day, 'd')}
                     </Text>
                     {dayData?.completed && (
-                      <View className="w-1.5 h-1.5 bg-amber-500 rounded-full mt-0.5" />
+                      <View className="w-1.5 h-1.5 bg-warning rounded-full mt-0.5" />
                     )}
                   </TouchableOpacity>
                 );
@@ -243,16 +246,16 @@ const HomeScreen: React.FC = () => {
                     key={dateString}
                     onPress={() => handleDateSelect({ dateString } as DateData)}
                     className={`w-10 h-10 rounded-lg items-center justify-center ${
-                      isSelected ? 'bg-slate-600' : isToday ? 'bg-slate-700' : 'bg-transparent'
+                      isSelected ? 'bg-primary' : isToday ? (isDark ? 'bg-dark-surface-secondary' : 'bg-light-surface-secondary') : 'bg-transparent'
                     }`}
                   >
                     <Text className={`text-base font-medium ${
-                      isSelected ? 'text-white' : isToday ? 'text-slate-300' : 'text-gray-200'
+                      isSelected ? (isDark ? 'text-gray-900' : 'text-white') : isToday ? (isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary') : (isDark ? 'text-dark-text' : 'text-light-text')
                     }`}>
                       {format(day, 'd')}
                     </Text>
                     {dayData?.completed && (
-                      <View className="w-1.5 h-1.5 bg-amber-500 rounded-full mt-0.5" />
+                      <View className="w-1.5 h-1.5 bg-warning rounded-full mt-0.5" />
                     )}
                   </TouchableOpacity>
                 );
@@ -262,9 +265,9 @@ const HomeScreen: React.FC = () => {
         </View>
 
         {/* Selected Date Actions */}
-        <View className="bg-gray-800 mx-4 mt-4 rounded-lg shadow-sm">
-            <View className="p-4 border-b border-gray-700">
-              <Text className="text-lg font-semibold text-gray-100">
+        <View className={`mx-4 mt-4 rounded-lg shadow-sm ${isDark ? 'bg-dark-surface' : 'bg-light-surface'}`}>
+            <View className={`p-4 border-b ${isDark ? 'border-dark-border' : 'border-light-border'}`}>
+              <Text className={`text-lg font-semibold ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
                 {format(parseISO(selectedDate), 'EEEE, MMMM d')}
               </Text>
             </View>
@@ -275,29 +278,29 @@ const HomeScreen: React.FC = () => {
                   <TouchableOpacity
                     key={workout.id}
                     onPress={() => handleWorkoutClick(workout.id)}
-                    className="p-3 bg-gray-700 rounded-lg"
+                    className={`p-3 rounded-lg ${isDark ? 'bg-dark-surface-secondary' : 'bg-light-surface-secondary'}`}
                   >
                     <View className="flex-row justify-between items-center">
                       <View className="flex-1">
-                        <Text className="font-medium text-gray-100">
+                        <Text className={`font-medium ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
                           {workout.name || 'Workout'}
                         </Text>
-                        <Text className="text-sm text-gray-300">
+                        <Text className={`text-sm ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>
                           {workout.sets.length} sets • {workout.duration || 'Not finished'}
                           {workout.duration && ' min'}
                         </Text>
                       </View>
                       <View className="flex-row items-center">
                         <View className={`px-2 py-1 rounded mr-2 ${
-                          workout.completed ? 'bg-teal-800' : 'bg-amber-800'
+                          workout.completed ? 'bg-success' : 'bg-warning'
                         }`}>
                           <Text className={`text-xs font-medium ${
-                            workout.completed ? 'text-teal-200' : 'text-amber-200'
+                            isDark ? 'text-dark-text' : 'text-light-text'
                           }`}>
                             {workout.completed ? 'Completed' : 'In Progress'}
                           </Text>
                         </View>
-                        <Text className="text-gray-500 text-sm">›</Text>
+                        <Text className={`${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'} text-sm`}>›</Text>
                       </View>
                     </View>
                   </TouchableOpacity>
@@ -305,31 +308,31 @@ const HomeScreen: React.FC = () => {
               </View>
             ) : (
               <View className="p-4">
-                <Text className="text-gray-600 text-center mb-4">
+                <Text className={`${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'} text-center mb-4`}>
                   No workout for this day
                 </Text>
                 <View className="space-y-2">
                   <TouchableOpacity
                     onPress={() => handleStartWorkout()}
-                    className="bg-gray-600 rounded-lg py-3"
+                    className="bg-primary rounded-lg py-3"
                   >
-                    <Text className="text-white text-center font-medium">
+                    <Text className={`${isDark ? 'text-gray-900' : 'text-white'} text-center font-medium`}>
                       Start Workout
                     </Text>
                   </TouchableOpacity>
                   
                   {templates.length > 0 && (
                     <View>
-                      <Text className="text-sm text-gray-300 text-center my-2">
+                      <Text className={`text-sm text-center my-2 ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>
                         Or choose a template:
                       </Text>
                       {templates.slice(0, 2).map(template => (
                         <TouchableOpacity
                           key={template.id}
                           onPress={() => handleStartWorkout(template.id)}
-                          className="bg-gray-600 rounded-lg py-2 px-3 mb-2"
+                          className="bg-primary rounded-lg py-2 px-3 mb-2"
                         >
-                          <Text className="text-gray-200 text-center font-medium">
+                          <Text className={`${isDark ? 'text-gray-900' : 'text-white'} text-center font-medium`}>
                             {template.name}
                           </Text>
                         </TouchableOpacity>
@@ -343,9 +346,9 @@ const HomeScreen: React.FC = () => {
 
         {/* Recent Workouts */}
         {recentWorkouts.length > 0 && (
-          <View className="bg-gray-800 mx-4 mt-4 rounded-lg shadow-sm">
-            <View className="p-4 border-b border-gray-700">
-              <Text className="text-lg font-semibold text-gray-100">
+          <View className={`mx-4 mt-4 rounded-lg shadow-sm ${isDark ? 'bg-dark-surface' : 'bg-light-surface'}`}>
+            <View className={`p-4 border-b ${isDark ? 'border-dark-border' : 'border-light-border'}`}>
+              <Text className={`text-lg font-semibold ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
                 Recent Workouts
               </Text>
             </View>
@@ -353,14 +356,14 @@ const HomeScreen: React.FC = () => {
               {recentWorkouts.map(workout => (
                 <View key={workout.id} className="flex-row justify-between items-center mb-3 last:mb-0">
                   <View className="flex-1">
-                    <Text className="font-medium text-gray-100">
+                    <Text className={`${isDark ? 'text-dark-text' : 'text-light-text'} font-medium`}>
                       {workout.name || 'Workout'}
                     </Text>
-                    <Text className="text-sm text-gray-300">
+                    <Text className={`text-sm ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>
                       {format(parseISO(workout.date), 'MMM d')} • {workout.sets.length} sets
                     </Text>
                   </View>
-                  <Text className="text-sm text-gray-300">
+                  <Text className={`text-sm ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>
                     {workout.duration}min
                   </Text>
                 </View>
@@ -368,8 +371,7 @@ const HomeScreen: React.FC = () => {
             </View>
           </View>
         )}
-
-        <View className="h-8" />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

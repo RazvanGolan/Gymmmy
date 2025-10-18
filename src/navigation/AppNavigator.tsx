@@ -11,10 +11,10 @@ import ProgressScreen from '../screens/ProgressScreen';
 import TemplatesScreen from '../screens/TemplatesScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import WorkoutSessionScreen from '../screens/WorkoutSessionScreen';
-import ExerciseHistoryScreen from '../screens/ExerciseHistoryScreen';
 import CreateTemplateScreen from '../screens/CreateTemplateScreen';
 import StatsScreen from '../screens/StatsScreen';
 import AddExerciseScreen from '../screens/AddExerciseScreen';
+import { useTheme } from '../contexts/ThemeContext';
 
 // Navigation Types
 export type RootTabParamList = {
@@ -58,20 +58,22 @@ const Tab = createBottomTabNavigator<RootTabParamList>();
 const Stack = createStackNavigator<RootStackParamList>();
 
 function TabNavigator() {
+  const { isDark } = useTheme();
+  
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#1f2937',
+          backgroundColor: isDark ? '#1f2937' : '#ffffff',
           borderTopWidth: 1,
-          borderTopColor: '#374151',
+          borderTopColor: isDark ? '#374151' : '#e2e8f0',
           paddingBottom: 8,
           paddingTop: 8,
           height: 70,
         },
-        tabBarActiveTintColor: '#64748b',
-        tabBarInactiveTintColor: '#9ca3af',
+        tabBarActiveTintColor: '#10d6bf',
+        tabBarInactiveTintColor: isDark ? '#9ca3af' : '#64748b',
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: '500',
@@ -133,6 +135,8 @@ function TabNavigator() {
 }
 
 export default function AppNavigator() {
+  const { isDark } = useTheme();
+  
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -148,20 +152,12 @@ export default function AppNavigator() {
             headerShown: true,
             headerTitle: 'Workout Session',
             headerStyle: {
-              backgroundColor: '#1f2937',
+              backgroundColor: isDark ? '#1f2937' : '#f8fafc',
             },
-            headerTintColor: '#f3f4f6',
+            headerTintColor: isDark ? '#f3f4f6' : '#1e293b',
             headerTitleStyle: {
               fontWeight: 'bold',
             },
-          }}
-        />
-        <Stack.Screen 
-          name="ExerciseHistory" 
-          component={ExerciseHistoryScreen}
-          options={{
-            headerShown: true,
-            headerTitle: 'Exercise History',
           }}
         />
         <Stack.Screen 
@@ -171,9 +167,9 @@ export default function AppNavigator() {
             headerShown: true,
             headerTitle: 'Create Template',
             headerStyle: {
-              backgroundColor: '#1f2937',
+              backgroundColor: isDark ? '#1f2937' : '#f8fafc',
             },
-            headerTintColor: '#f3f4f6',
+            headerTintColor: isDark ? '#f3f4f6' : '#1e293b',
             headerTitleStyle: {
               fontWeight: 'bold',
             },
@@ -186,9 +182,9 @@ export default function AppNavigator() {
             headerShown: true,
             headerTitle: 'Statistics',
             headerStyle: {
-              backgroundColor: '#1f2937',
+              backgroundColor: isDark ? '#1f2937' : '#f8fafc',
             },
-            headerTintColor: '#f3f4f6',
+            headerTintColor: isDark ? '#f3f4f6' : '#1e293b',
             headerTitleStyle: {
               fontWeight: 'bold',
             },
@@ -201,9 +197,9 @@ export default function AppNavigator() {
             headerShown: true,
             headerTitle: 'Add Exercise',
             headerStyle: {
-              backgroundColor: '#1f2937',
+              backgroundColor: isDark ? '#1f2937' : '#f8fafc',
             },
-            headerTintColor: '#f3f4f6',
+            headerTintColor: isDark ? '#f3f4f6' : '#1e293b',
             headerTitleStyle: {
               fontWeight: 'bold',
             },

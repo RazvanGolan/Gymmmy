@@ -9,6 +9,7 @@ import { exerciseService, Exercise, categories } from '../services/exerciseServi
 import { useTemplatesData } from '../hooks/useTemplatesData';
 import { useTemplateActions } from '../hooks/useTemplateActions';
 import { TemplateExercise, WorkoutTemplate } from '../types';
+import { useTheme } from '../contexts/ThemeContext';
 
 type CreateTemplateRouteProp = RouteProp<RootStackParamList, 'CreateTemplate'>;
 type NavigationProp = StackNavigationProp<RootStackParamList>;
@@ -17,6 +18,7 @@ const CreateTemplateScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<CreateTemplateRouteProp>();
   const { templateId } = route.params || {};
+  const { isDark } = useTheme();
   
   const { getTemplate } = useTemplatesData();
   const { createTemplate, updateTemplate: updateTemplateAction, loadTemplates } = useTemplateActions();
@@ -185,40 +187,40 @@ const CreateTemplateScreen: React.FC = () => {
       key={item.id}
       renderRightActions={() => renderDeleteAction(() => removeExercise(item.id))}
     >
-      <View className="bg-gray-800 rounded-lg p-4 mb-3 shadow-sm">
+      <View className={`${isDark ? 'bg-dark-surface' : 'bg-light-surface'} rounded-lg p-4 mb-3 shadow-sm`}>
         <View className="mb-3">
-          <Text className="text-lg font-semibold text-gray-100">
+          <Text className={`text-lg font-semibold ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
             {item.exerciseName}
           </Text>
         </View>
 
       <View className="flex-row gap-8">
         <View className="flex-1">
-          <Text className="text-sm text-gray-300 mb-1">Sets</Text>
+          <Text className={`text-sm mb-1 ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>Sets</Text>
           <TextInput
             value={item.sets.toString()}
             onChangeText={(value) => updateExercise(item.id, 'sets', parseInt(value) || 0)}
-            className="border border-gray-600 rounded-lg p-2 text-center bg-gray-700 text-gray-200"
+            className={`border rounded-lg p-2 text-center ${isDark ? 'border-dark-border bg-dark-surface-secondary text-dark-text' : 'border-light-border bg-light-surface-secondary text-light-text'}`}
             keyboardType="numeric"
             placeholder="3"
           />
         </View>
         <View className="flex-1">
-          <Text className="text-sm text-gray-300 mb-1">Reps</Text>
+          <Text className={`text-sm mb-1 ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>Reps</Text>
           <TextInput
             value={(item.reps || 0).toString()}
             onChangeText={(value) => updateExercise(item.id, 'reps', parseInt(value) || 0)}
-            className="border border-gray-600 rounded-lg p-2 text-center bg-gray-700 text-gray-200"
+            className={`border rounded-lg p-2 text-center ${isDark ? 'border-dark-border bg-dark-surface-secondary text-dark-text' : 'border-light-border bg-light-surface-secondary text-light-text'}`}
             keyboardType="numeric"
             placeholder="8"
           />
         </View>
         <View className="flex-1">
-          <Text className="text-sm text-gray-300 mb-1">Weight (kg)</Text>
+          <Text className={`text-sm mb-1 ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>Weight (kg)</Text>
           <TextInput
             value={item.weight?.toString() || ''}
             onChangeText={(value) => updateExercise(item.id, 'weight', parseInt(value) || undefined)}
-            className="border border-gray-600 rounded-lg p-2 text-center bg-gray-700 text-gray-200"
+            className={`border rounded-lg p-2 text-center ${isDark ? 'border-dark-border bg-dark-surface-secondary text-dark-text' : 'border-light-border bg-light-surface-secondary text-light-text'}`}
             keyboardType="numeric"
             placeholder="Optional"
           />
@@ -226,11 +228,11 @@ const CreateTemplateScreen: React.FC = () => {
       </View>
 
       <View className="mt-3">
-        <Text className="text-sm text-gray-300 mb-1">Notes</Text>
+        <Text className={`text-sm mb-1 ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>Notes</Text>
         <TextInput
           value={item.notes || ''}
           onChangeText={(value) => updateExercise(item.id, 'notes', value)}
-          className="border border-gray-600 rounded-lg p-2 bg-gray-700 text-gray-200"
+          className={`border rounded-lg p-2 ${isDark ? 'border-dark-border bg-dark-surface-secondary text-dark-text' : 'border-light-border bg-light-surface-secondary text-light-text'}`}
           placeholder="Exercise notes..."
           placeholderTextColor="#9ca3af"
           multiline
@@ -243,48 +245,48 @@ const CreateTemplateScreen: React.FC = () => {
   const renderAvailableExercise = ({ item }: { item: Exercise }) => (
     <TouchableOpacity
       onPress={() => addExercise(item)}
-      className="bg-gray-800 rounded-lg p-4 mb-2 shadow-sm border border-gray-600"
+      className={`${isDark ? 'bg-dark-surface border-dark-border' : 'bg-light-surface border-light-border'} rounded-lg p-4 mb-2 shadow-sm border`}
     >
-      <Text className="text-lg font-medium text-gray-100">{item.name}</Text>
-      <Text className="text-sm text-gray-300">{item.category}</Text>
+      <Text className={`text-lg font-medium ${isDark ? 'text-dark-text' : 'text-light-text'}`}>{item.name}</Text>
+      <Text className={`${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'} text-sm`}>{item.category}</Text>
     </TouchableOpacity>
   );
 
   if (showExerciseSelector) {
     return (
-      <View className="flex-1 bg-gray-900">
-        <View className="flex-row justify-between items-center p-4 bg-gray-800 border-b border-gray-700">
-          <Text className="text-xl font-bold text-gray-100">
+      <View className={`flex-1 ${isDark ? 'bg-dark-background' : 'bg-light-background'}`}>
+        <View className={`flex-row justify-between items-center p-4 ${isDark ? 'bg-dark-surface border-dark-border' : 'bg-light-surface border-light-border'} border-b`}>
+          <Text className={`text-xl font-bold ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
             Select Exercise
           </Text>
           <TouchableOpacity
             onPress={() => setShowExerciseSelector(false)}
             className="p-2"
           >
-            <Text className="text-slate-400 font-medium">Cancel</Text>
+            <Text className={`${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'} font-medium`}>Cancel</Text>
           </TouchableOpacity>
         </View>
         
         {/* Search Bar */}
-        <View className="bg-gray-800 px-4 py-3 border-b border-gray-700">
-          <View className="flex-row items-center bg-gray-700 rounded-lg p-3">
-            <Icon name="search" size={20} color="#6b7280" />
+        <View className={`${isDark ? 'bg-dark-surface border-dark-border' : 'bg-light-surface border-light-border'} px-4 py-3 border-b`}>
+          <View className={`flex-row items-center rounded-lg p-3 ${isDark ? 'bg-dark-surface-secondary' : 'bg-light-surface-secondary'}`}>
+            <Icon name="search" size={20} color={isDark ? '#9ca3af' : '#94a3b8'} />
             <TextInput
               value={searchQuery}
               onChangeText={setSearchQuery}
               placeholder="Search exercises..."
-              className="flex-1 ml-2 text-gray-200"
+              className={`flex-1 ml-2 ${isDark ? 'text-dark-text' : 'text-light-text'}`}
             />
             {searchQuery.length > 0 && (
               <TouchableOpacity onPress={() => setSearchQuery('')}>
-                <Icon name="clear" size={20} color="#6b7280" />
+                <Icon name="clear" size={20} color={isDark ? '#9ca3af' : '#94a3b8'} />
               </TouchableOpacity>
             )}
           </View>
         </View>
 
         {/* Category Filter */}
-        <View className="bg-gray-800 px-4 py-3 border-b border-gray-700">
+        <View className={`${isDark ? 'bg-dark-surface border-dark-border' : 'bg-light-surface border-light-border'} px-4 py-3 border-b`}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View className="flex-row space-x-2">
               {categories.map((category) => (
@@ -293,15 +295,15 @@ const CreateTemplateScreen: React.FC = () => {
                   onPress={() => setSelectedCategory(category)}
                   className={`px-4 py-2 rounded-full ${
                     selectedCategory === category
-                      ? 'bg-slate-600'
-                      : 'bg-gray-700'
+                      ? 'bg-primary'
+                      : isDark ? 'bg-dark-surface-secondary' : 'bg-light-surface-secondary'
                   }`}
                 >
                   <Text
                     className={`font-medium ${
                       selectedCategory === category
-                        ? 'text-white'
-                        : 'text-gray-300'
+                        ? (isDark ? 'text-gray-900' : 'text-white')
+                        : (isDark ? 'text-dark-text' : 'text-light-text')
                     }`}
                   >
                     {category}
@@ -318,12 +320,12 @@ const CreateTemplateScreen: React.FC = () => {
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ padding: 16 }}
           ListEmptyComponent={
-            <View className="bg-gray-800 rounded-lg p-8 items-center">
-              <Icon name="search-off" size={48} color="#6b7280" />
-              <Text className="text-gray-300 text-lg font-medium mt-4">
+            <View className={`${isDark ? 'bg-dark-surface' : 'bg-light-surface'} rounded-lg p-8 items-center`}>
+              <Icon name="search-off" size={48} color={isDark ? '#9ca3af' : '#94a3b8'} />
+              <Text className={`${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'} text-lg font-medium mt-4`}>
                 No exercises found
               </Text>
-              <Text className="text-gray-400 text-center mt-2">
+              <Text className={`${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'} text-center mt-2`}>
                 Try adjusting your search or category filter
               </Text>
             </View>
@@ -334,7 +336,7 @@ const CreateTemplateScreen: React.FC = () => {
   }
 
   return (
-    <GestureHandlerRootView className="flex-1 bg-gray-900">
+    <GestureHandlerRootView className={`flex-1 ${isDark ? 'bg-dark-background' : 'bg-light-background'}`}>
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1"
@@ -342,29 +344,29 @@ const CreateTemplateScreen: React.FC = () => {
         <View className="flex-1">
       <ScrollView className="flex-1">
         {/* Template Basic Info */}
-        <View className="bg-gray-800 p-4 border-b border-gray-700">
-          <Text className="text-xl font-bold text-gray-100 mb-4">
+        <View className={`${isDark ? 'bg-dark-surface border-dark-border' : 'bg-light-surface border-light-border'} p-4 border-b`}>
+          <Text className={`text-xl font-bold mb-4 ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
             {isEditing ? 'Edit Template' : 'Create New Template'}
           </Text>
           
           <View className="space-y-4">
             <View>
-              <Text className="text-sm text-gray-300 mb-2">Template Name *</Text>
+              <Text className={`text-sm mb-2 ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>Template Name *</Text>
               <TextInput
                 value={templateName}
                 onChangeText={setTemplateName}
-                className="border border-gray-600 rounded-lg p-3 bg-gray-700 text-gray-200"
+                className={`border rounded-lg p-3 ${isDark ? 'border-dark-border bg-dark-surface-secondary text-dark-text' : 'border-light-border bg-light-surface-secondary text-light-text'}`}
                 placeholder="e.g., Push Day, Full Body, etc."
                 placeholderTextColor="#9ca3af"
               />
             </View>
 
             <View>
-              <Text className="text-sm text-gray-300 mb-1 mt-4">Description</Text>
+              <Text className={`text-sm mb-1 mt-4 ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>Description</Text>
               <TextInput
                 value={templateDescription}
                 onChangeText={setTemplateDescription}
-                className="border border-gray-600 rounded-lg p-3 bg-gray-700 text-gray-200"
+                className={`border rounded-lg p-3 ${isDark ? 'border-dark-border bg-dark-surface-secondary text-dark-text' : 'border-light-border bg-light-surface-secondary text-light-text'}`}
                 placeholder="Brief description of this workout"
                 placeholderTextColor="#9ca3af"
                 multiline
@@ -375,23 +377,23 @@ const CreateTemplateScreen: React.FC = () => {
         </View>
 
         {/* Exercises */}
-        <View className="p-4 bg-gray-900 flex-1">
+        <View className={`p-4 flex-1 ${isDark ? 'bg-dark-background' : 'bg-light-background'}`}>
           <View className="flex-row justify-between items-center mb-4">
-            <Text className="text-lg font-semibold text-gray-100">
+            <Text className={`text-lg font-semibold ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
               Exercises ({exercises.length})
             </Text>
             <TouchableOpacity
               onPress={() => setShowExerciseSelector(true)}
-              className="bg-slate-600 rounded-lg px-4 py-2"
+              className="bg-primary rounded-lg px-4 py-2"
             >
-              <Text className="text-white font-medium">Add Exercise</Text>
+              <Text className={`${isDark ? 'text-gray-900' : 'text-white'} font-medium`}>Add Exercise</Text>
             </TouchableOpacity>
           </View>
 
           {exercises.length === 0 ? (
-            <View className="bg-gray-800 rounded-lg p-8 shadow-sm items-center">
-              <Text className="text-gray-300 mb-2">No exercises added yet</Text>
-              <Text className="text-sm text-gray-400 text-center">
+            <View className={`${isDark ? 'bg-dark-surface' : 'bg-light-surface'} rounded-lg p-8 shadow-sm items-center`}>
+              <Text className={`${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'} mb-2`}>No exercises added yet</Text>
+              <Text className={`${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'} text-sm text-center`}>
                 Tap "Add Exercise" to start building your template
               </Text>
             </View>
@@ -407,15 +409,15 @@ const CreateTemplateScreen: React.FC = () => {
       </ScrollView>
 
       {/* Save Button */}
-      <View className="bg-gray-800 border-t border-gray-700 p-4">
+      <View className={`${isDark ? 'bg-dark-surface border-dark-border' : 'bg-light-surface border-light-border'} border-t p-4`}>
         <TouchableOpacity
           onPress={saveTemplate}
           disabled={isLoading}
           className={`rounded-lg py-4 ${
-            isLoading ? 'bg-gray-600' : 'bg-slate-600'
+            isLoading ? (isDark ? 'bg-dark-surface-secondary' : 'bg-light-surface-secondary') : 'bg-primary'
           }`}
         >
-          <Text className="text-white text-center font-bold text-lg">
+          <Text className={`${isDark ? 'text-gray-900' : 'text-white'} text-center font-bold text-lg`}>
             {isLoading 
               ? 'Saving...' 
               : isEditing 

@@ -9,6 +9,7 @@ import { useWorkoutsData } from '../hooks/useWorkoutsData';
 import { useExercisesData } from '../hooks/useExercisesData';
 import { databaseService } from '../services/database';
 import { ProgressEntry } from '../types';
+import { useTheme } from '../contexts/ThemeContext';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -17,6 +18,7 @@ const ProgressScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const { workouts, getWorkoutStreak } = useWorkoutsData();
   const { exercises } = useExercisesData();
+  const { isDark } = useTheme();
   
   const [selectedTab, setSelectedTab] = useState<'overview' | 'body' | 'strength'>('overview');
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | '3months'>('month');
@@ -161,10 +163,10 @@ const ProgressScreen: React.FC = () => {
     
     if (weightEntries.length === 0) {
       return (
-        <View className="h-48 bg-gray-700 rounded-lg items-center justify-center">
-          <Text className="text-gray-500 text-lg">📊</Text>
-          <Text className="text-gray-500 mt-2">No weight data yet</Text>
-          <Text className="text-sm text-gray-400 text-center mt-1">
+        <View className={`h-48 rounded-lg items-center justify-center ${isDark ? 'bg-dark-surface-secondary' : 'bg-light-surface-secondary'}`}>
+          <Text className={`${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'} text-lg`}>📊</Text>
+          <Text className={`${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'} mt-2`}>No weight data yet</Text>
+          <Text className={`text-sm text-center mt-1 ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>
             Add weight entries to see your progress chart
           </Text>
         </View>
@@ -182,7 +184,7 @@ const ProgressScreen: React.FC = () => {
     const displayRange = displayMax - displayMin;
     
     return (
-      <View className="h-48 bg-gray-700 rounded-lg p-4">
+      <View className={`h-48 rounded-lg p-4 ${isDark ? 'bg-dark-surface-secondary' : 'bg-light-surface-secondary'}`}>
         <View className="flex-1 relative">
           {/* Target line */}
           {targetWeight && (
@@ -205,10 +207,10 @@ const ProgressScreen: React.FC = () => {
               return (
                 <View key={entry.id} className="items-center flex-1">
                   <View 
-                    className="bg-blue-400 rounded-t-sm w-3"
+                    className="bg-primary rounded-t-sm w-3"
                     style={{ height: `${height}%`, minHeight: 8 }}
                   />
-                  <Text className="text-xs text-gray-400 mt-1 transform -rotate-45">
+                  <Text className={`text-xs mt-1 transform -rotate-45 ${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'}`}>
                     {format(parseISO(entry.date), 'MM/dd')}
                   </Text>
                 </View>
@@ -218,22 +220,22 @@ const ProgressScreen: React.FC = () => {
           
           {/* Y-axis labels */}
           <View className="absolute left-0 top-0 bottom-0 w-12 justify-between">
-            <Text className="text-xs text-gray-400">{displayMax.toFixed(0)}kg</Text>
-            <Text className="text-xs text-gray-400">{((displayMax + displayMin) / 2).toFixed(0)}kg</Text>
-            <Text className="text-xs text-gray-400">{displayMin.toFixed(0)}kg</Text>
+            <Text className={`text-xs ${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'}`}>{displayMax.toFixed(0)}kg</Text>
+            <Text className={`text-xs ${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'}`}>{((displayMax + displayMin) / 2).toFixed(0)}kg</Text>
+            <Text className={`text-xs ${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'}`}>{displayMin.toFixed(0)}kg</Text>
           </View>
         </View>
         
         {/* Legend */}
         <View className="flex-row justify-center mt-2 space-x-4">
           <View className="flex-row items-center">
-            <View className="w-3 h-3 bg-blue-400 rounded mr-1" />
-            <Text className="text-xs text-gray-400">Weight</Text>
+            <View className="w-3 h-3 bg-primary rounded mr-1" />
+            <Text className={`text-xs ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>Weight</Text>
           </View>
           {targetWeight && (
             <View className="flex-row items-center">
               <View className="w-3 h-0.5 bg-yellow-400 mr-1" />
-              <Text className="text-xs text-gray-400">Target</Text>
+              <Text className={`text-xs ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>Target</Text>
             </View>
           )}
         </View>
@@ -261,14 +263,14 @@ const ProgressScreen: React.FC = () => {
       onPress={() => setSelectedTab(tab)}
       className={`flex-1 py-3 ${
         selectedTab === tab 
-          ? 'border-b-2 border-gray-600' 
-          : 'border-b border-gray-200'
+          ? 'border-b-2 border-primary' 
+          : (isDark ? 'border-b border-dark-border' : 'border-b border-light-border')
       }`}
     >
       <Text className={`text-center font-medium ${
         selectedTab === tab 
-          ? 'text-slate-400' 
-          : 'text-gray-600'
+          ? (isDark ? 'text-dark-text' : 'text-light-text') 
+          : (isDark ? 'text-dark-text-muted' : 'text-light-text-muted')
       }`}>
         {label}
       </Text>
@@ -278,51 +280,51 @@ const ProgressScreen: React.FC = () => {
   const renderOverview = () => (
     <View className="p-4">
       {/* Quick Stats */}
-      <View className="bg-gray-800 rounded-lg p-4 shadow-sm mb-4">
-        <Text className="text-lg font-semibold text-gray-100 mb-4">
+      <View className={`rounded-lg p-4 shadow-sm mb-4 ${isDark ? 'bg-dark-surface' : 'bg-light-surface'}`}>
+        <Text className={`text-lg font-semibold mb-4 ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
           Quick Stats
         </Text>
         <View className="flex-row justify-between">
           <View className="items-center">
-            <Text className="text-2xl font-bold text-gray-100">
+            <Text className={`text-2xl font-bold ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
               {completedWorkouts.length}
             </Text>
-            <Text className="text-sm text-gray-600">Total Workouts</Text>
+            <Text className={`text-sm ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>Total Workouts</Text>
           </View>
           <View className="items-center">
-            <Text className="text-2xl font-bold text-gray-100">
+            <Text className={`text-2xl font-bold ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
               {currentStreak}
             </Text>
-            <Text className="text-sm text-gray-600">Day Streak</Text>
+            <Text className={`text-sm ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>Day Streak</Text>
           </View>
           <View className="items-center">
-            <Text className="text-2xl font-bold text-gray-100">
+            <Text className={`text-2xl font-bold ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
               {thisWeekWorkouts}
             </Text>
-            <Text className="text-sm text-gray-600">This Week</Text>
+            <Text className={`text-sm ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>This Week</Text>
           </View>
           <View className="items-center">
-            <Text className="text-2xl font-bold text-gray-100">
+            <Text className={`text-2xl font-bold ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
               {thisMonthWorkouts}
             </Text>
-            <Text className="text-sm text-gray-600">This Month</Text>
+            <Text className={`text-sm ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>This Month</Text>
           </View>
         </View>
       </View>
 
       {/* Recent Progress */}
-      <View className="bg-gray-800 rounded-lg p-4 shadow-sm mb-4">
-        <Text className="text-lg font-semibold text-gray-100 mb-4">
+      <View className={`rounded-lg p-4 shadow-sm mb-4 ${isDark ? 'bg-dark-surface' : 'bg-light-surface'}`}>
+        <Text className={`text-lg font-semibold mb-4 ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
           Recent Progress
         </Text>
         
         {progressEntries.filter(entry => entry.type === 'weight' && entry.weight).length > 0 && (
           <View className="mb-4">
-            <Text className="text-sm text-gray-500 mb-2">Latest Weight</Text>
-            <Text className="text-2xl font-bold text-gray-100">
+            <Text className={`text-sm mb-2 ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>Latest Weight</Text>
+            <Text className={`text-2xl font-bold ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
               {progressEntries.filter(entry => entry.type === 'weight' && entry.weight)[0]?.weight}kg
             </Text>
-            <Text className="text-sm text-gray-500">
+            <Text className={`text-sm ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>
               {format(parseISO(progressEntries.filter(entry => entry.type === 'weight' && entry.weight)[0]?.date || ''), 'MMM d, yyyy')}
             </Text>
           </View>
@@ -332,18 +334,18 @@ const ProgressScreen: React.FC = () => {
           onPress={() => setShowAddWeight(true)}
           disabled={isLoading}
           className={`rounded-lg py-3 ${
-            isLoading ? 'bg-gray-500' : 'bg-gray-600'
+            isLoading ? (isDark ? 'bg-dark-border-secondary' : 'bg-light-border-secondary') : 'bg-primary'
           }`}
         >
-          <Text className="text-white text-center font-medium">
+          <Text className={`text-center font-medium ${isDark ? 'text-gray-900' : 'text-white'}`}>
             {isLoading ? 'Loading...' : 'Log Weight'}
           </Text>
         </TouchableOpacity>
       </View>
 
       {/* Charts */}
-      <View className="bg-gray-800 rounded-lg p-4 shadow-sm">
-        <Text className="text-lg font-semibold text-gray-100 mb-4">
+      <View className={`rounded-lg p-4 shadow-sm ${isDark ? 'bg-dark-surface' : 'bg-light-surface'}`}>
+        <Text className={`text-lg font-semibold mb-4 ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
           Weight Progress
         </Text>
         {renderProgressChart()}
@@ -354,16 +356,16 @@ const ProgressScreen: React.FC = () => {
   const renderBodyProgress = () => (
     <View className="p-4">
       {/* Weight History */}
-      <View className="bg-gray-800 rounded-lg p-4 shadow-sm mb-4">
+      <View className={`rounded-lg p-4 shadow-sm mb-4 ${isDark ? 'bg-dark-surface' : 'bg-light-surface'}`}>
         <View className="flex-row justify-between items-center mb-4">
-          <Text className="text-lg font-semibold text-gray-100">
+          <Text className={`text-lg font-semibold ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
             Weight History
           </Text>
           <TouchableOpacity 
             onPress={() => setShowAddWeight(true)}
-            className="bg-gray-600 rounded-lg px-3 py-2"
+            className="bg-primary rounded-lg px-3 py-2"
           >
-            <Text className="text-gray-100 text-sm font-medium">Add Entry</Text>
+            <Text className={`text-sm font-medium ${isDark ? 'text-gray-900' : 'text-white'}`}>Add Entry</Text>
           </TouchableOpacity>
         </View>
 
@@ -371,12 +373,12 @@ const ProgressScreen: React.FC = () => {
           progressEntries
             .filter(entry => entry.type === 'weight' && entry.weight)
             .map((entry, index, filteredEntries) => (
-              <View key={entry.id} className="flex-row justify-between items-center py-3 border-b border-gray-700 last:border-b-0">
+              <View key={entry.id} className={`flex-row justify-between items-center py-3 border-b last:border-b-0 ${isDark ? 'border-dark-border' : 'border-light-border'}`}>
                 <View>
-                  <Text className="font-medium text-gray-300">
+                  <Text className={`font-medium ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>
                     {entry.weight}kg
                   </Text>
-                  <Text className="text-sm text-gray-500">
+                  <Text className={`text-sm ${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'}`}>
                     {format(parseISO(entry.date), 'MMM d, yyyy')}
                   </Text>
                 </View>
@@ -387,7 +389,7 @@ const ProgressScreen: React.FC = () => {
                         ? 'text-red-600' 
                         : entry.weight! < filteredEntries[index + 1].weight!
                         ? 'text-green-600'
-                        : 'text-gray-600'
+                        : (isDark ? 'text-dark-text-muted' : 'text-light-text-muted')
                     }`}>
                       {entry.weight! > filteredEntries[index + 1].weight! ? '+' : ''}
                       {(entry.weight! - filteredEntries[index + 1].weight!).toFixed(1)}kg
@@ -398,8 +400,8 @@ const ProgressScreen: React.FC = () => {
             ))
         ) : (
           <View className="items-center py-8">
-            <Text className="text-gray-500 mb-2">No weight entries yet</Text>
-            <Text className="text-sm text-gray-400 text-center">
+            <Text className={`${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'} mb-2`}>No weight entries yet</Text>
+            <Text className={`text-sm text-center ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>
               Start tracking your weight to see progress
             </Text>
           </View>
@@ -407,14 +409,14 @@ const ProgressScreen: React.FC = () => {
       </View>
 
       {/* Body Measurements */}
-      <View className="bg-gray-800 rounded-lg p-4 shadow-sm">
-        <Text className="text-lg font-semibold text-gray-100 mb-4">
+      <View className={`rounded-lg p-4 shadow-sm ${isDark ? 'bg-dark-surface' : 'bg-light-surface'}`}>
+        <Text className={`text-lg font-semibold mb-4 ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
           Body Measurements
         </Text>
         <View className="items-center py-8">
-          <Text className="text-gray-500 mb-2">No measurements yet</Text>
-          <TouchableOpacity className="bg-gray-100 rounded-lg px-4 py-2">
-            <Text className="text-gray-700 font-medium">Add Measurements</Text>
+          <Text className={`${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'} mb-2`}>No measurements yet</Text>
+          <TouchableOpacity className={`rounded-lg px-4 py-2 bg-primary`}>
+            <Text className={`${isDark ? 'text-gray-900' : 'text-white'} font-medium`}>Add Measurements</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -424,27 +426,27 @@ const ProgressScreen: React.FC = () => {
   const renderStrengthProgress = () => (
     <View className="p-4">
       {/* Exercise Progress */}
-      <View className="bg-gray-800 rounded-lg p-4 shadow-sm mb-4">
-        <Text className="text-lg font-semibold text-gray-100 mb-4">
+      <View className={`rounded-lg p-4 shadow-sm mb-4 ${isDark ? 'bg-dark-surface' : 'bg-light-surface'}`}>
+        <Text className={`text-lg font-semibold mb-4 ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
           Strength Progress
         </Text>
         
         <View className="items-center py-8">
-          <Text className="text-gray-500 mb-2">Strength tracking coming soon</Text>
-          <Text className="text-sm text-gray-400 text-center">
+          <Text className={`${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'} mb-2`}>Strength tracking coming soon</Text>
+          <Text className={`text-sm text-center ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>
             Complete workouts to see your strength progress
           </Text>
         </View>
       </View>
 
       {/* Personal Records */}
-      <View className="bg-gray-800 rounded-lg p-4 shadow-sm">
-        <Text className="text-lg font-semibold text-gray-100 mb-4">
+      <View className={`rounded-lg p-4 shadow-sm ${isDark ? 'bg-dark-surface' : 'bg-light-surface'}`}>
+        <Text className={`text-lg font-semibold mb-4 ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
           Personal Records
         </Text>
         <View className="items-center py-8">
-          <Text className="text-gray-500 mb-2">No personal records yet</Text>
-          <Text className="text-sm text-gray-400 text-center">
+          <Text className={`${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'} mb-2`}>No personal records yet</Text>
+          <Text className={`text-sm text-center ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>
             Complete workouts to track your personal bests
           </Text>
         </View>
@@ -453,14 +455,14 @@ const ProgressScreen: React.FC = () => {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-900">
+    <SafeAreaView className={`flex-1 ${isDark ? 'bg-dark-background' : 'bg-light-background'}`} edges={['top']}>
       {/* Header */}
-      <View className="bg-gray-800 border-b border-gray-700">
+      <View className={`${isDark ? 'bg-dark-surface border-dark-border' : 'bg-light-surface border-light-border'} border-b`}>
         <View className="px-4 py-4">
-          <Text className="text-2xl font-bold text-gray-100">
+          <Text className={`text-2xl font-bold ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
             Progress
           </Text>
-          <Text className="text-gray-300">
+          <Text className={`${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>
             Track your fitness journey
           </Text>
         </View>
@@ -482,8 +484,8 @@ const ProgressScreen: React.FC = () => {
       {/* Add Weight Modal */}
       {showAddWeight && (
         <View className="absolute inset-0 items-center justify-center">
-          <View className="bg-gray-300 rounded-lg p-6 mx-4 w-full max-w-sm">
-            <Text className="text-lg font-semibold text-gray-800 mb-4">
+          <View className={`rounded-lg p-6 mx-4 w-full max-w-sm ${isDark ? 'bg-dark-surface' : 'bg-light-background'}`}>
+            <Text className={`text-lg font-semibold mb-4 ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
               Log Weight
             </Text>
             <TextInput
@@ -491,14 +493,14 @@ const ProgressScreen: React.FC = () => {
               onChangeText={setNewWeight}
               placeholder="Enter weight (kg)"
               keyboardType="numeric"
-              className="border border-gray-400 rounded-lg p-3 mb-4"
+              className={`border rounded-lg p-3 mb-4 ${isDark ? 'border-dark-border text-dark-text bg-dark-surface-secondary' : 'border-light-border text-light-text bg-light-surface-secondary'}`}
             />
             <View className="flex-row gap-4">
               <TouchableOpacity
                 onPress={() => setShowAddWeight(false)}
-                className="flex-1 bg-gray-200 rounded-lg py-3"
+                className={`flex-1 rounded-lg py-3 ${isDark ? 'bg-dark-surface-secondary' : 'bg-light-surface-secondary'}`}
               >
-                <Text className="text-gray-700 text-center font-medium">
+                <Text className={`text-center font-medium ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
                   Cancel
                 </Text>
               </TouchableOpacity>
@@ -506,10 +508,10 @@ const ProgressScreen: React.FC = () => {
                 onPress={handleAddWeight}
                 disabled={isLoading}
                 className={`flex-1 rounded-lg py-3 ${
-                  isLoading ? 'bg-gray-500' : 'bg-gray-600'
+                  isLoading ? (isDark ? 'bg-dark-border-secondary' : 'bg-light-border-secondary') : 'bg-primary'
                 }`}
               >
-                <Text className="text-white text-center font-medium">
+                <Text className={`text-center font-medium ${isDark ? 'text-gray-900' : 'text-white'}`}>
                   {isLoading ? 'Saving...' : 'Save'}
                 </Text>
               </TouchableOpacity>
@@ -520,14 +522,14 @@ const ProgressScreen: React.FC = () => {
       {/* Add Measurements Modal */}
       {showAddMeasurements && (
         <View className="absolute inset-0 bg-black bg-opacity-50 items-center justify-center">
-          <View className="bg-gray-800 rounded-lg p-6 mx-4 w-full max-w-sm">
-            <Text className="text-lg font-semibold text-gray-100 mb-4">
+          <View className={`rounded-lg p-6 mx-4 w-full max-w-sm ${isDark ? 'bg-dark-surface' : 'bg-light-background'}`}>
+            <Text className={`text-lg font-semibold mb-4 ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
               Add Body Measurements
             </Text>
             <ScrollView className="max-h-80">
               {Object.entries(newMeasurements).map(([key, value]) => (
                 <View key={key} className="mb-3">
-                  <Text className="text-gray-300 text-sm mb-1">
+                  <Text className={`${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'} text-sm mb-1`}>
                     {key.charAt(0).toUpperCase() + key.slice(1)} (cm)
                   </Text>
                   <TextInput
@@ -535,7 +537,7 @@ const ProgressScreen: React.FC = () => {
                     onChangeText={(text) => setNewMeasurements(prev => ({ ...prev, [key]: text }))}
                     placeholder={`Enter ${key} measurement`}
                     keyboardType="numeric"
-                    className="border border-gray-600 rounded-lg p-3 text-gray-200 bg-gray-700"
+                    className={`border rounded-lg p-3 ${isDark ? 'border-dark-border text-dark-text bg-dark-surface-secondary' : 'border-light-border text-light-text bg-light-surface-secondary'}`}
                     placeholderTextColor="#9ca3af"
                   />
                 </View>
@@ -544,9 +546,9 @@ const ProgressScreen: React.FC = () => {
             <View className="flex-row gap-4 mt-4">
               <TouchableOpacity
                 onPress={() => setShowAddMeasurements(false)}
-                className="flex-1 bg-gray-600 rounded-lg py-3"
+                className={`flex-1 rounded-lg py-3 ${isDark ? 'bg-dark-surface-secondary' : 'bg-light-surface-secondary'}`}
               >
-                <Text className="text-gray-200 text-center font-medium">
+                <Text className={`text-center font-medium ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
                   Cancel
                 </Text>
               </TouchableOpacity>
@@ -554,10 +556,10 @@ const ProgressScreen: React.FC = () => {
                 onPress={handleAddMeasurements}
                 disabled={isLoading}
                 className={`flex-1 rounded-lg py-3 ${
-                  isLoading ? 'bg-gray-500' : 'bg-slate-600'
+                  isLoading ? (isDark ? 'bg-dark-border-secondary' : 'bg-light-border-secondary') : 'bg-primary'
                 }`}
               >
-                <Text className="text-white text-center font-medium">
+                <Text className={`text-center font-medium ${isDark ? 'text-gray-900' : 'text-white'}`}>
                   {isLoading ? 'Saving...' : 'Save'}
                 </Text>
               </TouchableOpacity>

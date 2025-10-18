@@ -8,6 +8,8 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { useWorkoutsData } from '../hooks/useWorkoutsData';
 import { useWorkoutActions } from '../hooks/useWorkoutActions';
 import { useTemplatesData } from '../hooks/useTemplatesData';
+import { useTheme } from '../contexts/ThemeContext';
+import { Workout } from '../types';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -16,6 +18,7 @@ const WorkoutScreen: React.FC = () => {
   const { workouts } = useWorkoutsData();
   const { deleteWorkout, loadWorkouts } = useWorkoutActions();
   const { templates } = useTemplatesData();
+  const { isDark } = useTheme();
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'completed' | 'incomplete'>('all');
   const [isLoading, setIsLoading] = useState(true);
 
@@ -93,33 +96,37 @@ const WorkoutScreen: React.FC = () => {
     .sort((a, b) => b.usageCount - a.usageCount)
     .slice(0, 3);
 
-  const renderWorkout = ({ item }: { item: typeof workouts[0] }) => (
-    <View className="bg-gray-800 rounded-lg p-4 mb-3 shadow-sm">
+  const renderWorkout = ({ item }: { item: Workout }) => (
+    <View className={`rounded-lg p-4 mb-3 shadow-sm ${isDark ? 'bg-dark-surface' : 'bg-light-surface'}`}>
       <View className="flex-row justify-between items-start mb-2">
         <View className="flex-1">
-          <Text className="text-lg font-semibold text-gray-100">
+          <Text className={`text-lg font-semibold ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
             {item.name || 'Workout'}
           </Text>
-          <Text className="text-gray-300 text-sm">
+          <Text className={`${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'} text-sm`}>
             {format(parseISO(item.date), 'EEEE, MMMM d, yyyy')}
           </Text>
           <View className="flex-row mt-2">
-            <Text className="text-xs text-gray-400 mr-4">
+            <Text className={`text-xs mr-4 ${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'}`}>
               {item.sets?.length || 0} sets
             </Text>
-            <Text className="text-xs text-gray-400 mr-4">
+            <Text className={`text-xs mr-4 ${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'}`}>
               {new Set(item.sets?.map(set => set.exerciseId)).size || 0} exercises
             </Text>
             {item.duration && (
-              <Text className="text-xs text-gray-400 mr-4">
+              <Text className={`text-xs mr-4 ${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'}`}>
                 {item.duration}min
               </Text>
             )}
             <View className={`px-2 py-1 rounded ${
-              item.completed ? 'bg-teal-800' : 'bg-amber-800'
+              item.completed 
+                ? (isDark ? 'bg-teal-800' : 'bg-teal-100') 
+                : (isDark ? 'bg-amber-800' : 'bg-amber-100')
             }`}>
               <Text className={`text-xs font-medium ${
-                item.completed ? 'text-teal-200' : 'text-amber-200'
+                item.completed 
+                  ? (isDark ? 'text-teal-200' : 'text-teal-800') 
+                  : (isDark ? 'text-amber-200' : 'text-amber-800')
               }`}>
                 {item.completed ? 'Completed' : 'In Progress'}
               </Text>
@@ -135,7 +142,7 @@ const WorkoutScreen: React.FC = () => {
       </View>
 
       {item.notes && (
-        <Text className="text-gray-300 text-sm mb-3">
+        <Text className={`${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'} text-sm mb-3`}>
           {item.notes}
         </Text>
       )}
@@ -143,18 +150,18 @@ const WorkoutScreen: React.FC = () => {
       <View className="flex-row">
         <TouchableOpacity
           onPress={() => handleEditWorkout(item.id)}
-          className="flex-1 bg-gray-600 rounded-lg py-2 mr-2"
+          className="flex-1 rounded-lg py-2 mr-2 bg-primary"
         >
-          <Text className="text-gray-200 text-center font-medium">
+          <Text className={`text-center font-medium ${isDark ? 'text-gray-900' : 'text-white'}`}>
             {item.completed ? 'View' : 'Continue'}
           </Text>
         </TouchableOpacity>
         {!item.completed && (
           <TouchableOpacity
             onPress={() => handleEditWorkout(item.id)}
-            className="flex-1 bg-slate-600 rounded-lg py-2 ml-2"
+            className={`flex-1 rounded-lg py-2 ml-2 ${isDark ? 'bg-dark-surface-secondary' : 'bg-light-surface-secondary'}`}
           >
-            <Text className="text-white text-center font-medium">
+            <Text className={`text-center font-medium ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
               Resume
             </Text>
           </TouchableOpacity>
@@ -168,15 +175,17 @@ const WorkoutScreen: React.FC = () => {
       onPress={() => setSelectedFilter(filter)}
       className={`px-4 py-2 rounded-lg ${
         selectedFilter === filter 
-          ? 'bg-slate-600' 
-          : 'bg-gray-700'
+          ? 'bg-primary' 
+          : (isDark ? 'bg-dark-surface-secondary' : 'bg-light-surface-secondary')
       }`}
     >
-      <Text className={`font-medium ${
-        selectedFilter === filter 
-          ? 'text-white' 
-          : 'text-gray-300'
-      }`}>
+      <Text 
+        className={`font-medium ${
+          selectedFilter === filter 
+            ? (isDark ? 'text-gray-900' : 'text-white') 
+            : (isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary')
+        }`}
+      >
         {label}
       </Text>
     </TouchableOpacity>
@@ -184,44 +193,44 @@ const WorkoutScreen: React.FC = () => {
 
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-gray-900">
+      <SafeAreaView className={`flex-1 ${isDark ? 'bg-dark-background' : 'bg-light-background'}`} edges={['top']}>
         <View className="flex-1 justify-center items-center">
-          <Text className="text-gray-300 text-lg">Loading...</Text>
+          <Text className={`text-lg ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>Loading...</Text>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-900">
+    <SafeAreaView className={`flex-1 ${isDark ? 'bg-dark-background' : 'bg-light-background'}`} edges={['top']}>
       <ScrollView 
         className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1 }}
       >
+        <View className="pb-4">
         {/* Header */}
-        <View className="bg-gray-800 px-4 py-6 border-b border-gray-700">
+        <View className={`px-4 py-6 border-b ${isDark ? 'bg-dark-surface border-dark-border' : 'bg-light-surface border-light-border'}`}>
           <View className="flex-row justify-between items-center">
-            <Text className="text-2xl font-bold text-gray-100">
+            <Text className={`text-2xl font-bold ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
               Workouts
             </Text>
             <TouchableOpacity
               onPress={() => handleStartWorkout()}
-              className="bg-slate-600 rounded-lg px-4 py-2"
+              className="rounded-lg px-4 py-2 bg-primary"
             >
-              <Text className="text-white font-medium">New Workout</Text>
+              <Text className={`font-medium ${isDark ? 'text-gray-900' : 'text-white'}`}>New Workout</Text>
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Quick Start Templates */}
         {recentTemplates.length > 0 && (
-          <View className="bg-gray-800 mx-4 mt-4 rounded-lg shadow-sm">
-            <View className="p-4 border-b border-gray-700">
-              <Text className="text-lg font-semibold text-gray-100">
+          <View className={`mx-4 mt-4 rounded-lg shadow-sm ${isDark ? 'bg-dark-surface' : 'bg-light-surface'}`}>
+            <View className={`p-4 border-b ${isDark ? 'border-dark-border' : 'border-light-border'}`}>
+              <Text className={`text-lg font-semibold ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
                 Quick Start
               </Text>
-              <Text className="text-sm text-gray-300">
+              <Text className={`text-sm ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>
                 Start a workout from your most used templates
               </Text>
             </View>
@@ -231,9 +240,9 @@ const WorkoutScreen: React.FC = () => {
                   <TouchableOpacity
                     key={template.id}
                     onPress={() => handleStartWorkout(template.id)}
-                    className="bg-slate-700 rounded-lg px-3 py-2 mr-2 mb-2"
+                    className="rounded-lg px-3 py-2 mr-2 mb-2 bg-primary"
                   >
-                    <Text className="text-slate-200 font-medium">
+                    <Text className={`font-medium ${isDark ? 'text-gray-900' : 'text-white'}`}>
                       {template.name}
                     </Text>
                   </TouchableOpacity>
@@ -244,7 +253,7 @@ const WorkoutScreen: React.FC = () => {
         )}
 
         {/* Filter Options */}
-        <View className="flex-row justify-center gap-4 py-4 bg-gray-800 mx-4 mt-4 rounded-lg shadow-sm">
+        <View className={`flex-row justify-center gap-4 py-4 mx-4 mt-4 rounded-lg shadow-sm ${isDark ? 'bg-dark-surface' : 'bg-light-surface'}`}>
           <FilterButton filter="all" label="All" />
           <FilterButton filter="completed" label="Completed" />
           <FilterButton filter="incomplete" label="In Progress" />
@@ -253,22 +262,22 @@ const WorkoutScreen: React.FC = () => {
         {/* Workouts List */}
         <View className="px-4 mt-4">
           {filteredWorkouts.length === 0 ? (
-            <View className="bg-gray-800 rounded-lg p-8 shadow-sm items-center">
-              <Text className="text-gray-300 text-lg mb-2">
+            <View className={`rounded-lg p-8 shadow-sm items-center ${isDark ? 'bg-dark-surface' : 'bg-light-surface'}`}>
+              <Text className={`text-lg mb-2 ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>
                 {selectedFilter === 'all' ? 'No workouts yet' :
                  selectedFilter === 'completed' ? 'No completed workouts' :
                  'No workouts in progress'}
               </Text>
-              <Text className="text-sm text-gray-400 text-center mb-4">
+              <Text className={`text-sm text-center mb-4 ${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'}`}>
                 {selectedFilter === 'all' ? 'Start your first workout to begin tracking your progress' :
                  selectedFilter === 'completed' ? 'Complete a workout to see it here' :
                  'Start a new workout to see it in progress'}
               </Text>
               <TouchableOpacity
                 onPress={() => handleStartWorkout()}
-                className="bg-slate-600 rounded-lg px-6 py-3"
+                className="rounded-lg px-6 py-3 bg-primary"
               >
-                <Text className="text-white font-medium">
+                <Text className={`font-medium ${isDark ? 'text-gray-900' : 'text-white'}`}>
                   Start First Workout
                 </Text>
               </TouchableOpacity>
@@ -284,7 +293,7 @@ const WorkoutScreen: React.FC = () => {
           )}
         </View>
 
-        <View className="h-8" />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

@@ -5,6 +5,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { exerciseService, Exercise, categories } from '../services/exerciseService';
+import { useTheme } from '../contexts/ThemeContext';
 
 type AddExerciseRouteProp = RouteProp<RootStackParamList, 'AddExercise'>;
 type NavigationProp = StackNavigationProp<RootStackParamList>;
@@ -13,6 +14,7 @@ const AddExerciseScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<AddExerciseRouteProp>();
   const { onSelectExercise } = route.params;
+  const { isDark } = useTheme();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
@@ -100,27 +102,27 @@ const AddExerciseScreen: React.FC = () => {
   };
 
   return (
-    <View className="flex-1 bg-gray-900">
+    <View className={`flex-1 ${isDark ? 'bg-dark-background' : 'bg-light-background'}`}>
       {/* Search Bar */}
-      <View className="bg-gray-800 px-4 py-3 border-b border-gray-700">
-        <View className="flex-row items-center bg-gray-700 rounded-lg p-3">
-          <Icon name="search" size={20} color="#9ca3af" />
+      <View className={`${isDark ? 'bg-dark-surface border-dark-border' : 'bg-light-surface border-light-border'} px-4 py-3 border-b`}>
+        <View className={`flex-row items-center rounded-lg p-3 ${isDark ? 'bg-dark-surface-secondary' : 'bg-light-surface-secondary'}`}>
+          <Icon name="search" size={20} color={isDark ? '#9ca3af' : '#64748b'} />
           <TextInput
             value={searchQuery}
             onChangeText={setSearchQuery}
             placeholder="Search exercises..."
-            className="flex-1 ml-2 text-gray-200"
+            className={`flex-1 ml-2 ${isDark ? 'text-dark-text' : 'text-light-text'}`}
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Icon name="clear" size={20} color="#6b7280" />
+              <Icon name="clear" size={20} color={isDark ? '#9ca3af' : '#94a3b8'} />
             </TouchableOpacity>
           )}
         </View>
       </View>
 
       {/* Category Filter */}
-      <View className="bg-gray-800 px-4 py-3 border-b border-gray-700">
+      <View className={`${isDark ? 'bg-dark-surface border-dark-border' : 'bg-light-surface border-light-border'} px-4 py-3 border-b`}>
         <View className="flex-row flex-wrap gap-2">
           {categories.map((category) => (
             <TouchableOpacity
@@ -128,16 +130,16 @@ const AddExerciseScreen: React.FC = () => {
               onPress={() => setSelectedCategory(category)}
               className={`px-4 py-2 rounded-full ${
                 selectedCategory === category
-                  ? 'bg-slate-600'
-                  : 'bg-gray-700'
+                  ? 'bg-primary'
+                  : isDark ? 'bg-dark-surface-secondary' : 'bg-light-surface-secondary'
               }`}
               style={{ minWidth: '22%' }}
             >
               <Text
                 className={`font-medium text-center ${
                   selectedCategory === category
-                    ? 'text-white'
-                    : 'text-gray-300'
+                    ? (isDark ? 'text-gray-900' : 'text-white')
+                    : (isDark ? 'text-dark-text' : 'text-light-text')
                 }`}
               >
                 {category}
@@ -151,18 +153,18 @@ const AddExerciseScreen: React.FC = () => {
       <ScrollView className="flex-1">
         <View className="p-4">
           {loading ? (
-            <View className="bg-gray-800 rounded-lg p-8 items-center">
-              <Text className="text-gray-300 text-lg font-medium">
+            <View className={`${isDark ? 'bg-dark-surface' : 'bg-light-surface'} rounded-lg p-8 items-center`}>
+              <Text className={`${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'} text-lg font-medium`}>
                 Loading exercises...
               </Text>
             </View>
           ) : filteredExercises.length === 0 ? (
-            <View className="bg-gray-800 rounded-lg p-8 items-center">
-              <Icon name="search-off" size={48} color="#6b7280" />
-              <Text className="text-gray-300 text-lg font-medium mt-4">
+            <View className={`${isDark ? 'bg-dark-surface' : 'bg-light-surface'} rounded-lg p-8 items-center`}>
+              <Icon name="search-off" size={48} color={isDark ? '#9ca3af' : '#94a3b8'} />
+              <Text className={`${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'} text-lg font-medium mt-4`}>
                 No exercises found
               </Text>
-              <Text className="text-gray-400 text-center mt-2">
+              <Text className={`${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'} text-center mt-2`}>
                 Try adjusting your search or category filter
               </Text>
             </View>
@@ -171,21 +173,21 @@ const AddExerciseScreen: React.FC = () => {
               <TouchableOpacity
                 key={exercise.id}
                 onPress={() => handleSelectExercise(exercise)}
-                className="bg-gray-800 rounded-lg p-4 mb-3 shadow-sm"
+                className={`${isDark ? 'bg-dark-surface' : 'bg-light-surface'} rounded-lg p-4 mb-3 shadow-sm`}
               >
                 <View className="flex-row items-center justify-between">
                   <View className="flex-1">
-                    <Text className="text-lg font-semibold text-gray-100 mb-1">
+                    <Text className={`text-lg font-semibold mb-1 ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
                       {exercise.name}
                     </Text>
                     <View className="flex-row items-center">
-                      <Icon name="category" size={16} color="#9ca3af" />
-                      <Text className="text-sm text-gray-300 ml-1">
+                      <Icon name="category" size={16} color={isDark ? '#9ca3af' : '#94a3b8'} />
+                      <Text className={`text-sm ml-1 ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>
                         {exercise.category}
                       </Text>
                     </View>
                   </View>
-                  <Icon name="add-circle" size={24} color="#64748b" />
+                  <Icon name="add-circle" size={24} color={isDark ? '#10d6bf' : '#10d6bf'} />
                 </View>
               </TouchableOpacity>
             ))
@@ -193,7 +195,6 @@ const AddExerciseScreen: React.FC = () => {
         </View>
       </ScrollView>
 
-      {/* Custom Exercise Button */}
       {/* Custom Exercise Modal */}
       <Modal
         visible={showCustomModal}
@@ -205,22 +206,22 @@ const AddExerciseScreen: React.FC = () => {
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           className="flex-1 bg-black/20 justify-center px-4"
         >
-          <View className="bg-gray-800 rounded-lg p-6 max-w-sm mx-auto w-full">
-            <Text className="text-xl font-bold text-gray-100 mb-4">
+          <View className={`${isDark ? 'bg-dark-surface' : 'bg-light-surface'} rounded-lg p-6 max-w-sm mx-auto w-full`}>
+            <Text className={`text-xl font-bold mb-4 ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
               Create Custom Exercise
             </Text>
             
-            <Text className="text-sm font-medium text-gray-300 mb-2">
+            <Text className={`text-sm font-medium mb-2 ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>
               Exercise Name
             </Text>
             <TextInput
               value={customExerciseName}
               onChangeText={setCustomExerciseName}
               placeholder="Enter exercise name"
-              className="border border-gray-600 rounded-lg p-3 mb-4 bg-gray-700 text-gray-200"
+              className={`border rounded-lg p-3 mb-4 ${isDark ? 'border-dark-border bg-dark-surface-secondary text-dark-text' : 'border-light-border bg-light-surface-secondary text-light-text'}`}
             />
             
-            <Text className="text-sm font-medium text-gray-300 mb-2">
+            <Text className={`text-sm font-medium mb-2 ${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>
               Category
             </Text>
             <View className="flex-row flex-wrap gap-2 mb-6">
@@ -230,16 +231,16 @@ const AddExerciseScreen: React.FC = () => {
                   onPress={() => setCustomExerciseCategory(category)}
                   className={`px-3 py-2 rounded-full ${
                     customExerciseCategory === category
-                      ? 'bg-slate-600'
-                      : 'bg-gray-700'
+                      ? 'bg-primary'
+                      : isDark ? 'bg-dark-surface-secondary' : 'bg-light-surface-secondary'
                   }`}
                   style={{ minWidth: '22%' }}
                 >
                   <Text
                     className={`font-medium text-center text-xs ${
                       customExerciseCategory === category
-                        ? 'text-white'
-                        : 'text-gray-300'
+                        ? (isDark ? 'text-gray-900' : 'text-white')
+                        : (isDark ? 'text-dark-text' : 'text-light-text')
                     }`}
                   >
                     {category}
@@ -251,17 +252,17 @@ const AddExerciseScreen: React.FC = () => {
             <View className="flex-row space-x-3 justify-between gap-5">
               <TouchableOpacity
                 onPress={() => setShowCustomModal(false)}
-                className="flex-1 bg-gray-600 rounded-lg py-3"
+                className={`flex-1 rounded-lg py-3 ${isDark ? 'bg-dark-surface-secondary' : 'bg-light-surface-secondary'}`}
               >
-                <Text className="text-gray-300 text-center font-medium">
+                <Text className={`${isDark ? 'text-dark-text' : 'text-light-text'} text-center font-medium`}>
                   Cancel
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={createCustomExercise}
-                className="flex-1 bg-slate-600 rounded-lg py-3"
+                className="flex-1 bg-primary rounded-lg py-3"
               >
-                <Text className="text-white text-center font-medium">
+                <Text className={`${isDark ? 'text-gray-900' : 'text-white'} text-center font-medium`}>
                   Create
                 </Text>
               </TouchableOpacity>
@@ -271,13 +272,13 @@ const AddExerciseScreen: React.FC = () => {
       </Modal>
 
       {/* Custom Exercise Button */}
-      <View className="bg-gray-800 border-t border-gray-700 p-4">
+      <View className={`${isDark ? 'bg-dark-surface border-dark-border' : 'bg-light-surface border-light-border'} border-t p-4`}>
         <TouchableOpacity
           onPress={() => setShowCustomModal(true)}
-          className="bg-gray-600 rounded-lg py-3 flex-row items-center justify-center"
+          className={`${isDark ? 'bg-dark-surface-secondary' : 'bg-light-surface-secondary'} rounded-lg py-3 flex-row items-center justify-center`}
         >
-          <Icon name="add" size={20} color="#d1d5db" />
-          <Text className="text-gray-200 font-medium ml-2">
+          <Icon name="add" size={20} color={isDark ? '#f3f4f6' : '#1e293b'} />
+          <Text className={`${isDark ? 'text-dark-text' : 'text-light-text'} font-medium ml-2`}>
             Create Custom Exercise
           </Text>
         </TouchableOpacity>

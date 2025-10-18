@@ -10,6 +10,7 @@ import { useWorkoutsData } from '../hooks/useWorkoutsData';
 import { useTemplatesData } from '../hooks/useTemplatesData';
 import { useTemplateActions } from '../hooks/useTemplateActions';
 import { Workout, WorkoutSet, TemplateExercise } from '../types';
+import { useTheme } from '../contexts/ThemeContext';
 
 type WorkoutSessionRouteProp = RouteProp<RootStackParamList, 'WorkoutSession'>;
 type NavigationProp = StackNavigationProp<RootStackParamList>;
@@ -22,6 +23,7 @@ const WorkoutSessionScreen: React.FC = () => {
   const { getWorkout } = useWorkoutsData();
   const { getTemplate } = useTemplatesData();
   const { incrementTemplateUsage } = useTemplateActions();
+  const { isDark } = useTheme();
 
   const [workoutName, setWorkoutName] = useState('Workout Session');
   const [workoutSets, setWorkoutSets] = useState<WorkoutSet[]>([]);
@@ -207,9 +209,9 @@ const WorkoutSessionScreen: React.FC = () => {
   const groupedExercises = getGroupedExercises();
 
   return (
-    <GestureHandlerRootView className="flex-1 bg-gray-900">
+    <GestureHandlerRootView className={`flex-1 ${isDark ? 'bg-dark-background' : 'bg-light-background'}`}>
       <KeyboardAvoidingView 
-        className="flex-1 bg-gray-900"
+        className={`flex-1 ${isDark ? 'bg-dark-background' : 'bg-light-background'}`}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 88 : 0}
       >
@@ -218,14 +220,14 @@ const WorkoutSessionScreen: React.FC = () => {
             onStartShouldSetResponder={() => true}
           >
         {/* Workout Header */}
-        <View className="bg-gray-800 p-4 border-b border-gray-700">
+        <View className={`p-4 border-b ${isDark ? 'bg-dark-surface border-dark-border' : 'bg-light-surface border-light-border'}`}>
           <TextInput
             value={workoutName}
             onChangeText={setWorkoutName}
-            className="text-xl font-bold text-gray-100 mb-2 bg-transparent"
+            className={`text-xl font-bold mb-2 bg-transparent ${isDark ? 'text-dark-text' : 'text-light-text'}`}
             placeholder="Workout Name"
           />
-          <Text className="text-gray-300">
+          <Text className={`${isDark ? 'text-dark-text-secondary' : 'text-light-text-secondary'}`}>
             {new Date(date).toLocaleDateString('en-US', { 
               weekday: 'long',
               year: 'numeric',
@@ -243,24 +245,24 @@ const WorkoutSessionScreen: React.FC = () => {
               key={exercise.exerciseId}
               renderRightActions={() => renderDeleteAction(() => removeExercise(exercise.exerciseId))}
             >
-              <View className="bg-gray-800 rounded-lg p-4 mb-4 shadow-sm">
-              <Text className="text-lg font-semibold text-gray-100 mb-3">
+              <View className={`rounded-lg p-4 mb-4 shadow-sm ${isDark ? 'bg-dark-surface' : 'bg-light-surface'}`}>
+              <Text className={`text-lg font-semibold mb-3 ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
                 {exercise.exerciseName}
               </Text>
               
               {/* Sets Header */}
               <View className="flex-row items-center justify-between mb-3">
                 <View className="w-16 items-center">
-                  <Text className="text-xs text-gray-400 font-medium">Set</Text>
+                  <Text className={`text-xs font-medium ${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'}`}>Set</Text>
                 </View>
                 <View className="w-20 items-center">
-                  <Text className="text-xs text-gray-400 font-medium">Last</Text>
+                  <Text className={`text-xs font-medium ${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'}`}>Last</Text>
                 </View>
                 <View className="w-16 items-center">
-                  <Text className="text-xs text-gray-400 font-medium">Reps</Text>
+                  <Text className={`text-xs font-medium ${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'}`}>Reps</Text>
                 </View>
                 <View className="w-20 items-center">
-                  <Text className="text-xs text-gray-400 font-medium">Weight (kg)</Text>
+                  <Text className={`text-xs font-medium ${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'}`}>Weight (kg)</Text>
                 </View>
               </View>
 
@@ -271,28 +273,28 @@ const WorkoutSessionScreen: React.FC = () => {
                     key={set.id}
                     renderRightActions={() => renderDeleteAction(() => removeSet(set.id))}
                   >
-                    <View className="flex-row items-center justify-between mb-3 bg-gray-800">
+                    <View className={`flex-row items-center justify-between mb-3 ${isDark ? 'bg-dark-surface' : 'bg-light-surface'}`}>
                       <View className="w-16 items-center justify-center">
-                        <Text className="text-center text-gray-200 font-medium">
+                        <Text className={`text-center font-medium ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
                           {setIndex + 1}
                         </Text>
                       </View>
                       <View className="w-20 items-center justify-center">
-                        <Text className="text-center text-gray-400 text-xs">
+                        <Text className={`text-center text-xs ${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'}`}>
                           {set.reps}x{set.weight}kg
                         </Text>
                       </View>
                       <TextInput
                         value={set.reps.toString()}
                         onChangeText={(value) => updateSetValue(set.id, 'reps', value)}
-                        className="w-16 px-2 py-1 border border-gray-600 rounded text-center bg-gray-700 text-gray-200"
+                        className={`w-16 px-2 py-1 border rounded text-center ${isDark ? 'border-dark-border bg-dark-surface-secondary text-dark-text' : 'border-light-border bg-light-surface-secondary text-light-text'}`}
                         keyboardType="numeric"
                         placeholder="0"
                       />
                       <TextInput
                         value={set.weight?.toString() || '0'}
                         onChangeText={(value) => updateSetValue(set.id, 'weight', value)}
-                        className="w-20 px-2 py-1 border border-gray-600 rounded text-center bg-gray-700 text-gray-200"
+                        className={`w-20 px-2 py-1 border rounded text-center ${isDark ? 'border-dark-border bg-dark-surface-secondary text-dark-text' : 'border-light-border bg-light-surface-secondary text-light-text'}`}
                         keyboardType="numeric"
                         placeholder="0"
                       />
@@ -304,9 +306,9 @@ const WorkoutSessionScreen: React.FC = () => {
               {/* Add Set Button */}
               <TouchableOpacity
                 onPress={() => addSet(exercise.exerciseId)}
-                className="mt-4 bg-gray-600 rounded-lg py-2"
+                className={`mt-4 rounded-lg py-2 ${isDark ? 'bg-dark-surface-secondary' : 'bg-light-surface-secondary'}`}
               >
-                <Text className="text-gray-200 text-center font-medium">
+                <Text className={`text-center font-medium ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
                   + Add Set
                 </Text>
               </TouchableOpacity>
@@ -317,16 +319,16 @@ const WorkoutSessionScreen: React.FC = () => {
           {/* Add Exercise Button */}
           <TouchableOpacity
             onPress={addExercise}
-            className="bg-slate-600 rounded-lg py-3 mb-4"
+            className="bg-primary rounded-lg py-3 mb-4"
           >
-            <Text className="text-white text-center font-medium">
+            <Text className={`text-center font-medium ${isDark ? 'text-gray-900' : 'text-white'}`}>
               + Add Exercise
             </Text>
           </TouchableOpacity>
 
           {/* Workout Notes */}
-          <View className="bg-gray-800 rounded-lg p-4 mb-4 shadow-sm">
-            <Text className="text-lg font-semibold text-gray-100 mb-2">
+          <View className={`rounded-lg p-4 mb-4 shadow-sm ${isDark ? 'bg-dark-surface' : 'bg-light-surface'}`}>
+            <Text className={`text-lg font-semibold mb-2 ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
               Notes
             </Text>
             <TextInput
@@ -336,7 +338,7 @@ const WorkoutSessionScreen: React.FC = () => {
               placeholderTextColor="#9ca3af"
               multiline
               numberOfLines={3}
-              className="border border-gray-600 rounded-lg p-3 text-gray-200 bg-gray-700"
+              className={`border rounded-lg p-3 ${isDark ? 'border-dark-border text-dark-text bg-dark-surface-secondary' : 'border-light-border text-light-text bg-light-surface-secondary'}`}
             />
           </View>
         </View>
@@ -344,21 +346,21 @@ const WorkoutSessionScreen: React.FC = () => {
       </KeyboardAvoidingView>
 
       {/* Bottom Action Buttons */}
-      <View className="bg-gray-800 border-t border-gray-700 p-4">
+      <View className={`${isDark ? 'bg-dark-surface border-dark-border' : 'bg-light-surface border-light-border'} border-t p-4`}>
         <View className="flex-row justify-between gap-5">
           <TouchableOpacity
             onPress={discardWorkout}
-            className="flex-1 bg-gray-600 rounded-lg py-3"
+            className={`flex-1 rounded-lg py-3 ${isDark ? 'bg-dark-surface-secondary' : 'bg-light-surface-secondary'}`}
           >
-            <Text className="text-white text-center font-medium">
+            <Text className={`text-center font-medium ${isDark ? 'text-dark-text' : 'text-light-text'}`}>
               Delete Workout
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={finishWorkout}
-            className="flex-1 bg-teal-600 rounded-lg py-3"
+            className="flex-1 bg-primary rounded-lg py-3"
           >
-            <Text className="text-white text-center font-medium">
+            <Text className={`text-center font-medium ${isDark ? 'text-gray-900' : 'text-white'}`}>
               Finish Workout
             </Text>
           </TouchableOpacity>

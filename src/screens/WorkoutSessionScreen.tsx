@@ -20,7 +20,7 @@ const WorkoutSessionScreen: React.FC = () => {
   const route = useRoute<WorkoutSessionRouteProp>();
   const { date, templateId, workoutId } = route.params;
   const { createWorkout, updateWorkout } = useWorkoutActions();
-  const { getWorkout } = useWorkoutsData();
+  const { getWorkout, workouts } = useWorkoutsData();
   const { getTemplate } = useTemplatesData();
   const { incrementTemplateUsage } = useTemplateActions();
   const { isDark } = useTheme();
@@ -29,6 +29,31 @@ const WorkoutSessionScreen: React.FC = () => {
   const [workoutSets, setWorkoutSets] = useState<WorkoutSet[]>([]);
   const [workoutNotes, setWorkoutNotes] = useState('');
   const [startTime] = useState(new Date().toISOString());
+  const [lastWorkoutData, setLastWorkoutData] = useState<{ [exerciseId: string]: WorkoutSet[] }>({});
+
+  const getLastWorkoutDataForExercises = (exerciseIds: string[]) => {
+    const lastData: { [exerciseId: string]: WorkoutSet[] } = {};
+    
+    const completedWorkouts = workouts
+      .filter(w => w.completed && w.id !== workoutId)
+      .sort((a, b) => {
+        const timeA = a.endTime ? new Date(a.endTime).getTime() : new Date(a.date).getTime();
+        const timeB = b.endTime ? new Date(b.endTime).getTime() : new Date(b.date).getTime();
+        return timeB - timeA;
+      });
+
+    exerciseIds.forEach(exerciseId => {
+      for (const workout of completedWorkouts) {
+        const exerciseSets = workout.sets.filter(set => set.exerciseId === exerciseId);
+        if (exerciseSets.length > 0) {
+          lastData[exerciseId] = exerciseSets;
+          break;
+        }
+      }
+    });
+
+    return lastData;
+  };
 
   useEffect(() => {
     // If editing existing workout, load the data
@@ -38,6 +63,10 @@ const WorkoutSessionScreen: React.FC = () => {
         setWorkoutName(existingWorkout.name || 'Workout Session');
         setWorkoutNotes(existingWorkout.notes || '');
         setWorkoutSets(existingWorkout.sets);
+        
+        const exerciseIds = [...new Set(existingWorkout.sets.map(set => set.exerciseId))];
+        const lastData = getLastWorkoutDataForExercises(exerciseIds);
+        setLastWorkoutData(lastData);
       }
     } else if (templateId) {
       const template = getTemplate(templateId);
@@ -46,7 +75,10 @@ const WorkoutSessionScreen: React.FC = () => {
         
         // Convert template exercises to workout sets
         const templateSets: WorkoutSet[] = [];
+        const exerciseIds: string[] = [];
+        
         template.exercises.forEach(exercise => {
+          exerciseIds.push(exercise.exerciseId);
           for (let i = 0; i < exercise.sets; i++) {
             templateSets.push({
               id: `${exercise.exerciseId}-${i + 1}`,
@@ -61,9 +93,12 @@ const WorkoutSessionScreen: React.FC = () => {
         });
         
         setWorkoutSets(templateSets);
+        
+        const lastData = getLastWorkoutDataForExercises(exerciseIds);
+        setLastWorkoutData(lastData);
       }
     }
-  }, [workoutId, templateId, getWorkout, getTemplate]);
+  }, [workoutId, templateId, getWorkout, getTemplate, workouts]);
 
   const updateSetValue = (setId: string, field: 'reps' | 'weight', value: string) => {
     setWorkoutSets(workoutSets.map(set => 
@@ -107,6 +142,9 @@ const WorkoutSessionScreen: React.FC = () => {
           notes: '',
         };
         setWorkoutSets([...workoutSets, newSet]);
+        
+        const lastData = getLastWorkoutDataForExercises([selectedExercise.id]);
+        setLastWorkoutData(prev => ({ ...prev, ...lastData }));
       }
     });
   };
@@ -267,7 +305,11 @@ const WorkoutSessionScreen: React.FC = () => {
               </View>
 
               {/* Sets */}
-              {exercise.sets.map((set: WorkoutSet, setIndex: number) => {                
+              {exercise.sets.map((set: WorkoutSet, setIndex: number) => {
+                const lastSets = lastWorkoutData[exercise.exerciseId] || [];
+                const lastSet = lastSets[setIndex];
+                const lastSetDisplay = lastSet ? `${lastSet.reps}x${lastSet.weight}` : '-';
+                
                 return (
                   <Swipeable
                     key={set.id}
@@ -281,7 +323,7 @@ const WorkoutSessionScreen: React.FC = () => {
                       </View>
                       <View className="w-20 items-center justify-center">
                         <Text className={`text-center text-xs ${isDark ? 'text-dark-text-muted' : 'text-light-text-muted'}`}>
-                          {set.reps}x{set.weight}kg
+                          {lastSetDisplay}
                         </Text>
                       </View>
                       <TextInput

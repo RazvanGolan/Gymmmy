@@ -1,0 +1,28 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with gradient -->
+  <rect width="1024" height="1024" rx="180" fill="url(#gradient)"/>
+  <defs>
+    <linearGradient id="gradient" x1="0" y1="0" x2="1024" y2="1024" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#10d6bf"/>
+      <stop offset="100%" stop-color="#0ea89c"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Dumbbell icon -->
+  <g transform="translate(512, 512)">
+    <!-- Left weight -->
+    <rect x="-380" y="-120" width="140" height="240" rx="20" fill="#1e293b"/>
+    <!-- Left handle connection -->
+    <rect x="-240" y="-40" width="80" height="80" rx="10" fill="#1e293b"/>
+    <!-- Center bar -->
+    <rect x="-160" y="-25" width="320" height="50" rx="25" fill="#1e293b"/>
+    <!-- Right handle connection -->
+    <rect x="160" y="-40" width="80" height="80" rx="10" fill="#1e293b"/>
+    <!-- Right weight -->
+    <rect x="240" y="-120" width="140" height="240" rx="20" fill="#1e293b"/>
+    
+    <!-- Highlight effect on weights -->
+    <rect x="-360" y="-100" width="100" height="40" rx="10" fill="white" opacity="0.15"/>
+    <rect x="260" y="-100" width="100" height="40" rx="10" fill="white" opacity="0.15"/>
+  </g>
+</svg>

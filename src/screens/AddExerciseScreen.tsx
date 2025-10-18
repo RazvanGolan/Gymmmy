@@ -56,11 +56,11 @@ const AddExerciseScreen: React.FC = () => {
 
   const handleSelectExercise = (exercise: Exercise) => {
     const newExercise = {
-      id: Date.now().toString(), 
+      id: exercise.id, 
       name: exercise.name,
       sets: [
         {
-          id: `${Date.now()}-1`,
+          id: `${exercise.id}-1`,
           last: '8x12kg',
           reps: '8',
           weight: '0'

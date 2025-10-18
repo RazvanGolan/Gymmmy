@@ -1,31 +1,45 @@
 {
   "expo": {
     "name": "Gymmy",
-    "slug": "Gymmy",
+    "slug": "gymmy",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#10d6bf"
     },
     "ios": {
-      "supportsTablet": true
+      "simulator": false,
+      "buildConfiguration": "Release",
+      "credentialsSource": "local",
+      "bundleIdentifier": "com.razvangolan.gymmy",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#10d6bf"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.razvangolan.gymmy",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "b641510d-a6ae-4760-bb87-737ae659da22"
+      }
+    },
+    "owner": "razvangolan"
   }
 }

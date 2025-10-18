@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, Modal, KeyboardAvoidingView, Platform } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -19,8 +19,38 @@ const AddExerciseScreen: React.FC = () => {
   const [showCustomModal, setShowCustomModal] = useState(false);
   const [customExerciseName, setCustomExerciseName] = useState('');
   const [customExerciseCategory, setCustomExerciseCategory] = useState('Chest');
+  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [filteredExercises, setFilteredExercises] = useState<Exercise[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredExercises = exerciseService.searchExercises(searchQuery, selectedCategory);
+  useEffect(() => {
+    loadExercises();
+  }, []);
+
+  useEffect(() => {
+    filterExercises();
+  }, [exercises, searchQuery, selectedCategory]);
+
+  const loadExercises = async () => {
+    try {
+      setLoading(true);
+      const allExercises = await exerciseService.getAllExercises();
+      setExercises(allExercises);
+    } catch (error) {
+      console.error('Failed to load exercises:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filterExercises = async () => {
+    try {
+      const filtered = await exerciseService.searchExercises(searchQuery, selectedCategory);
+      setFilteredExercises(filtered);
+    } catch (error) {
+      console.error('Failed to filter exercises:', error);
+    }
+  };
 
   const handleSelectExercise = (exercise: Exercise) => {
     const newExercise = {
@@ -42,23 +72,31 @@ const AddExerciseScreen: React.FC = () => {
     navigation.goBack();
   };
 
-  const createCustomExercise = () => {
+  const createCustomExercise = async () => {
     if (!customExerciseName.trim()) {
       Alert.alert('Error', 'Please enter an exercise name');
       return;
     }
 
-    if (exerciseService.exerciseExists(customExerciseName)) {
+    const exists = await exerciseService.exerciseExists(customExerciseName);
+    if (exists) {
       Alert.alert('Error', 'An exercise with this name already exists');
       return;
     }
 
-    const newExercise = exerciseService.addCustomExercise(customExerciseName, customExerciseCategory);
-    setShowCustomModal(false);
-    setCustomExerciseName('');
-    setCustomExerciseCategory('Chest');
-    
-    handleSelectExercise(newExercise);
+    const newExercise = await exerciseService.addCustomExercise(customExerciseName, customExerciseCategory);
+    if (newExercise) {
+      setShowCustomModal(false);
+      setCustomExerciseName('');
+      setCustomExerciseCategory('Chest');
+      
+      // Reload exercises to include the new one
+      await loadExercises();
+      
+      handleSelectExercise(newExercise);
+    } else {
+      Alert.alert('Error', 'Failed to create custom exercise');
+    }
   };
 
   return (
@@ -112,7 +150,13 @@ const AddExerciseScreen: React.FC = () => {
       {/* Exercise List */}
       <ScrollView className="flex-1">
         <View className="p-4">
-          {filteredExercises.length === 0 ? (
+          {loading ? (
+            <View className="bg-gray-800 rounded-lg p-8 items-center">
+              <Text className="text-gray-300 text-lg font-medium">
+                Loading exercises...
+              </Text>
+            </View>
+          ) : filteredExercises.length === 0 ? (
             <View className="bg-gray-800 rounded-lg p-8 items-center">
               <Icon name="search-off" size={48} color="#6b7280" />
               <Text className="text-gray-300 text-lg font-medium mt-4">

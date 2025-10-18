@@ -1,9 +1,8 @@
 # 🏋️‍♂️ Gymmy - Complete Workout Tracking App
 
-A comprehensive React Native fitness tracking application built with Expo that helps users track workouts, monitor progress, and use customizable workout templates. Features a modern UI with Tailwind CSS and cloud-based data storage.
+A comprehensive React Native fitness tracking application built with Expo that helps users track workouts, monitor progress, and use customizable workout templates. Features a modern UI with Tailwind CSS and local SQLite database storage for a single-user experience.
 
 ## ✨ Features
-
 ### 🏠 **Home/Calendar View**
 - **Monthly Calendar**: Visual representation of workout history with color-coded completion status
 - **Daily Workout Overview**: View and manage workouts for any selected date
@@ -26,32 +25,33 @@ A comprehensive React Native fitness tracking application built with Expo that h
 ### 📊 **Progress Tracking**
 - **Exercise History**: Detailed progression tracking for each exercise
 - **Personal Records**: Automatic PR detection and tracking
-- **Body Metrics**: Weight and body composition logging
+- **Body Metrics**: Weight and body composition logging with target weight goals
 - **Statistical Analysis**: Workout frequency, volume, and strength trends
+- **Progress Charts**: Visual representation of weight progress towards goals
 
 ### 📈 **Statistics**
 - **Comprehensive Analytics**: Total workouts, duration, sets, reps, and volume
 - **Streak Tracking**: Current and longest workout streaks
 - **Weekly Comparisons**: Compare current vs previous week performance
-- **Favorite Exercises**: Most performed exercises ranking
+- **Exercise Frequency**: Most performed exercises ranking with usage analytics
 
-### 👤 **Profile Management**
-- **User Settings**: Personal information and fitness goals
-- **Preferences**: Notifications, privacy, and app customization
-- **Data Export**: Export workout data for backup or analysis
+### 👤 **Profile & Settings**
+- **Target Weight Goals**: Set and track progress towards weight goals
+- **App Settings**: Customize app behavior and preferences
+- **Data Management**: Local data storage with reset capabilities
 
 ## 🛠️ Tech Stack
 
 - **Frontend**: React Native + Expo
 - **Navigation**: React Navigation 6 (Bottom Tabs + Stack)
 - **Styling**: Tailwind CSS via NativeWind
-- **State Management**: Zustand with persistence
-- **Database**: Supabase (PostgreSQL)
-- **Authentication**: Supabase Auth
-- **Storage**: AsyncStorage for offline caching
+- **State Management**: Zustand with optimized hook architecture
+- **Database**: SQLite (expo-sqlite) for local storage
+- **Storage**: Local SQLite database with persistent data
 - **Date Handling**: date-fns
 - **Calendar**: react-native-calendars
 - **TypeScript**: Full type safety
+- **Architecture**: Single-user local-first application
 
 ## ⚙️ Installation & Setup
 
@@ -67,97 +67,7 @@ cd Gymmy
 npm install
 ```
 
-### 2. Environment Configuration
-Create a `.env` file in the root directory:
-```env
-EXPO_PUBLIC_SUPABASE_URL=your_supabase_project_url
-EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
-
-### 3. Supabase Setup
-1. Create a new Supabase project
-2. Run the following SQL to create tables:
-
-```sql
--- Users table
-CREATE TABLE users (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  email TEXT UNIQUE NOT NULL,
-  name TEXT NOT NULL,
-  weight DECIMAL,
-  preferences JSONB,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Exercises table
-CREATE TABLE exercises (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name TEXT NOT NULL,
-  category TEXT NOT NULL,
-  description TEXT,
-  instructions TEXT[],
-  muscle_groups TEXT[],
-  equipment TEXT[],
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Workout templates table
-CREATE TABLE workout_templates (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  name TEXT NOT NULL,
-  description TEXT,
-  category TEXT,
-  estimated_duration INTEGER,
-  exercises JSONB NOT NULL,
-  usage_count INTEGER DEFAULT 0,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Workouts table
-CREATE TABLE workouts (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  name TEXT,
-  date DATE NOT NULL,
-  start_time TIMESTAMP WITH TIME ZONE,
-  end_time TIMESTAMP WITH TIME ZONE,
-  duration INTEGER,
-  sets JSONB NOT NULL,
-  template_id UUID REFERENCES workout_templates(id),
-  notes TEXT,
-  completed BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Progress entries table
-CREATE TABLE progress_entries (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  date DATE NOT NULL,
-  type TEXT CHECK (type IN ('weight', 'body_measurement', 'fitness_test', 'photo')),
-  weight DECIMAL,
-  body_fat_percentage DECIMAL,
-  muscle_mass DECIMAL,
-  measurements JSONB,
-  notes TEXT,
-  photos TEXT[],
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Insert default exercises
-INSERT INTO exercises (name, category, muscle_groups, equipment) VALUES
-('Bench Press', 'Chest', '{"Chest","Shoulders","Triceps"}', '{"Barbell","Bench"}'),
-('Squat', 'Legs', '{"Quadriceps","Glutes","Hamstrings"}', '{"Barbell","Squat Rack"}'),
-('Deadlift', 'Back', '{"Back","Glutes","Hamstrings"}', '{"Barbell"}'),
-('Pull-ups', 'Back', '{"Back","Biceps"}', '{"Pull-up Bar"}'),
-('Overhead Press', 'Shoulders', '{"Shoulders","Triceps"}', '{"Barbell"}');
-```
-
-### 4. Run the App
+### 2. Run the App
 ```bash
 # Start development server
 npm start
@@ -181,13 +91,19 @@ npm run android
 1. **Create Template**: Build custom workout routines
 2. **Exercise Selection**: Choose from comprehensive exercise database
 3. **Configure Details**: Set target sets, reps, and weights
-4. **Reuse**: Start workouts from saved templates
+4. **Reuse**: Start workouts from saved templates with usage tracking
 
 ### Progress Analytics
 1. **Exercise History**: Track performance over time
-2. **Body Metrics**: Log weight and measurements
-3. **Statistical Analysis**: View trends and patterns
-4. **Personal Records**: Automatic PR detection
+2. **Body Metrics**: Log weight, measurements, and track towards target goals
+3. **Statistical Analysis**: View trends and patterns with real-time calculations
+4. **Progress Charts**: Visual weight tracking with target goal visualization
+
+### Data Management
+- **Local Storage**: All data stored locally in SQLite database
+- **Single User**: Designed for individual use without authentication
+- **Performance Optimized**: Separated hooks architecture for efficient rendering
+- **Real-time Stats**: Live calculations from actual workout data
 
 ## 📄 License
 

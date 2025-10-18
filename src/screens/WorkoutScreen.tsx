@@ -5,32 +5,59 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { format, parseISO } from 'date-fns';
 import { RootStackParamList } from '../navigation/AppNavigator';
-import { useWorkoutStore } from '../stores/workoutStore';
-import { useTemplateStore } from '../stores/templateStore';
+import { useWorkoutsData } from '../hooks/useWorkoutsData';
+import { useWorkoutActions } from '../hooks/useWorkoutActions';
+import { useTemplatesData } from '../hooks/useTemplatesData';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 const WorkoutScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
-  const { workouts, deleteWorkout } = useWorkoutStore();
-  const { templates } = useTemplateStore();
+  const { workouts } = useWorkoutsData();
+  const { deleteWorkout, loadWorkouts } = useWorkoutActions();
+  const { templates } = useTemplatesData();
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'completed' | 'incomplete'>('all');
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load workouts when component mounts with a small delay to ensure navigation is ready
+  React.useEffect(() => {
+    const loadData = async () => {
+      try {
+        await loadWorkouts();
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error loading workouts:', error);
+        setIsLoading(false);
+      }
+    };
+    
+    const timer = setTimeout(loadData, 100);
+    return () => clearTimeout(timer);
+  }, [loadWorkouts]);
 
   const handleStartWorkout = (templateId?: string) => {
-    const today = format(new Date(), 'yyyy-MM-dd');
-    navigation.navigate('WorkoutSession', { 
-      date: today,
-      templateId,
-    });
+    try {
+      const today = format(new Date(), 'yyyy-MM-dd');
+      navigation.navigate('WorkoutSession', { 
+        date: today,
+        templateId,
+      });
+    } catch (error) {
+      console.error('Navigation error:', error);
+    }
   };
 
   const handleEditWorkout = (workoutId: string) => {
-    const workout = workouts.find(w => w.id === workoutId);
-    if (workout) {
-      navigation.navigate('WorkoutSession', {
-        date: workout.date,
-        workoutId: workout.id,
-      });
+    try {
+      const workout = workouts.find(w => w.id === workoutId);
+      if (workout) {
+        navigation.navigate('WorkoutSession', {
+          date: workout.date,
+          workoutId: workout.id,
+        });
+      }
+    } catch (error) {
+      console.error('Navigation error:', error);
     }
   };
 
@@ -78,7 +105,10 @@ const WorkoutScreen: React.FC = () => {
           </Text>
           <View className="flex-row mt-2">
             <Text className="text-xs text-gray-400 mr-4">
-              {item.sets.length} exercises
+              {item.sets?.length || 0} sets
+            </Text>
+            <Text className="text-xs text-gray-400 mr-4">
+              {new Set(item.sets?.map(set => set.exerciseId)).size || 0} exercises
             </Text>
             {item.duration && (
               <Text className="text-xs text-gray-400 mr-4">
@@ -151,6 +181,16 @@ const WorkoutScreen: React.FC = () => {
       </Text>
     </TouchableOpacity>
   );
+
+  if (isLoading) {
+    return (
+      <SafeAreaView className="flex-1 bg-gray-900">
+        <View className="flex-1 justify-center items-center">
+          <Text className="text-gray-300 text-lg">Loading...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-gray-900">

@@ -8,8 +8,12 @@ import { format, parseISO, startOfWeek, addWeeks, eachDayOfInterval, endOfWeek }
 import { RootStackParamList, RootTabParamList } from '../navigation/AppNavigator';
 import { CompositeNavigationProp } from '@react-navigation/native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { useWorkoutStore } from '../stores/workoutStore';
-import { useTemplateStore } from '../stores/templateStore';
+import { useWorkoutsData } from '../hooks/useWorkoutsData';
+import { useTemplatesData } from '../hooks/useTemplatesData';
+import { useTemplateActions } from '../hooks/useTemplateActions';
+import { useExerciseActions } from '../hooks/useExerciseActions';
+import { useWorkoutActions } from '../hooks/useWorkoutActions';
+import { databaseService } from '../services/database';
 
 type NavigationProp = CompositeNavigationProp<
   StackNavigationProp<RootStackParamList>,
@@ -18,16 +22,31 @@ type NavigationProp = CompositeNavigationProp<
 
 const HomeScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
-  const { workouts, getWorkoutStreak } = useWorkoutStore();
-  const { templates, loadDefaultExercises } = useTemplateStore();
+  const { workouts, getWorkoutStreak } = useWorkoutsData();
+  const { templates } = useTemplatesData();
+  const { loadTemplates } = useTemplateActions();
+  const { loadExercises } = useExerciseActions();
+  const { loadWorkouts } = useWorkoutActions();
   
   const [selectedDate, setSelectedDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
   const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
 
   useEffect(() => {
-    // Load default exercises on app start
-    loadDefaultExercises();
-  }, [loadDefaultExercises]);
+    const initializeApp = async () => {
+      try {
+        await databaseService.init();
+        
+        await loadTemplates();
+        await loadExercises();
+        await loadWorkouts();
+      } catch (error) {
+        console.error('Failed to initialize app:', error);
+      }
+    };
+    
+    const timer = setTimeout(initializeApp, 200);
+    return () => clearTimeout(timer);
+  }, [loadTemplates, loadExercises, loadWorkouts]);
 
   const streak = getWorkoutStreak();
   
@@ -251,12 +270,12 @@ const HomeScreen: React.FC = () => {
             </View>
             
             {selectedDateWorkouts.length > 0 ? (
-              <View className="p-4">
+              <View className="p-4 gap-3">
                 {selectedDateWorkouts.map(workout => (
                   <TouchableOpacity
                     key={workout.id}
                     onPress={() => handleWorkoutClick(workout.id)}
-                    className="mb-3 last:mb-0 p-3 bg-gray-700 rounded-lg"
+                    className="p-3 bg-gray-700 rounded-lg"
                   >
                     <View className="flex-row justify-between items-center">
                       <View className="flex-1">
@@ -264,7 +283,7 @@ const HomeScreen: React.FC = () => {
                           {workout.name || 'Workout'}
                         </Text>
                         <Text className="text-sm text-gray-300">
-                          {workout.sets.length} exercises • {workout.duration || 'Not finished'}
+                          {workout.sets.length} sets • {workout.duration || 'Not finished'}
                           {workout.duration && ' min'}
                         </Text>
                       </View>
@@ -330,7 +349,7 @@ const HomeScreen: React.FC = () => {
                 Recent Workouts
               </Text>
             </View>
-            <View className="p-4">
+            <View className="p-4 gap-3">
               {recentWorkouts.map(workout => (
                 <View key={workout.id} className="flex-row justify-between items-center mb-3 last:mb-0">
                   <View className="flex-1">
@@ -338,7 +357,7 @@ const HomeScreen: React.FC = () => {
                       {workout.name || 'Workout'}
                     </Text>
                     <Text className="text-sm text-gray-300">
-                      {format(parseISO(workout.date), 'MMM d')} • {workout.sets.length} exercises
+                      {format(parseISO(workout.date), 'MMM d')} • {workout.sets.length} sets
                     </Text>
                   </View>
                   <Text className="text-sm text-gray-300">

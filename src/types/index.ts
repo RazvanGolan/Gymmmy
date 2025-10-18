@@ -21,7 +21,6 @@ export interface WorkoutSet {
 
 export interface Workout {
   id: string;
-  userId: string;
   name?: string;
   date: string; // ISO date string for easier serialization
   startTime?: string; // ISO datetime string
@@ -37,11 +36,8 @@ export interface Workout {
 
 export interface WorkoutTemplate {
   id: string;
-  userId: string;
   name: string;
   description?: string;
-  category?: string; 
-  estimatedDuration?: number; // in minutes
   exercises: TemplateExercise[];
   createdAt: string;
   updatedAt: string;
@@ -60,32 +56,8 @@ export interface TemplateExercise {
   order: number; // Display order in template
 }
 
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  weight?: number;
-  preferences?: UserPreferences;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface UserPreferences {
-  weightUnit: 'kg' | 'lbs';
-  notifications: {
-    workoutReminders: boolean;
-    achievementAlerts: boolean;
-    weeklyProgress: boolean;
-  };
-  privacy: {
-    shareProgress: boolean;
-    publicProfile: boolean;
-  };
-}
-
 export interface ProgressEntry {
   id: string;
-  userId: string;
   date: string; // ISO date string
   type: 'weight' | 'body_measurement' | 'fitness_test' | 'photo';
   weight?: number;
@@ -127,12 +99,15 @@ export interface UserStats {
   totalDuration: number; // in minutes
   totalSets: number;
   totalReps: number;
-  totalWeight: number;
-  currentStreak: number;
-  longestStreak: number;
-  averageWorkoutDuration: number;
-  favoriteExercises: { exerciseId: string; exerciseName: string; count: number }[];
-  weeklyStats: WeeklyStats[];
+}
+
+export interface UserSettings {
+  id: string;
+  targetWeight?: number;
+  notificationsEnabled: boolean;
+  darkModeEnabled: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface WeeklyStats {
@@ -157,23 +132,6 @@ export interface ApiResponse<T> {
   data?: T;
   error?: string;
   message?: string;
-}
-
-export interface AuthUser {
-  id: string;
-  email: string;
-  name: string;
-}
-
-export interface LoginCredentials {
-  email: string;
-  password: string;
-}
-
-export interface RegisterCredentials {
-  email: string;
-  password: string;
-  name: string;
 }
 
 export const EXERCISE_CATEGORIES = [

@@ -1,43 +1,23 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, FlatList } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, FlatList, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
-
-// Mock data - will be replaced with real data from state management
-const mockTemplates = [
-  {
-    id: '1',
-    name: 'Push Day',
-    description: 'Chest, shoulders, and triceps workout',
-    exercises: 6,
-    estimatedDuration: 60,
-    usageCount: 12,
-  },
-  {
-    id: '2',
-    name: 'Pull Day',
-    description: 'Back and biceps focused routine',
-    exercises: 5,
-    estimatedDuration: 55,
-    usageCount: 8,
-  },
-  {
-    id: '3',
-    name: 'Leg Day',
-    description: 'Complete lower body workout',
-    exercises: 7,
-    estimatedDuration: 70,
-    usageCount: 10,
-  },
-];
+import { useTemplatesData } from '../hooks/useTemplatesData';
+import { useTemplateActions } from '../hooks/useTemplateActions';
+import { format } from 'date-fns';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 const TemplatesScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
-  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  const { templates, isLoading, error } = useTemplatesData();
+  const { loadTemplates, deleteTemplate, incrementTemplateUsage } = useTemplateActions();
+
+  useEffect(() => {
+    loadTemplates();
+  }, [loadTemplates]);
 
   const handleCreateTemplate = () => {
     navigation.navigate('CreateTemplate', {});
@@ -47,41 +27,56 @@ const TemplatesScreen: React.FC = () => {
     navigation.navigate('CreateTemplate', { templateId });
   };
 
-  const handleUseTemplate = (templateId: string) => {
-    const today = new Date().toISOString().split('T')[0];
+  const handleUseTemplate = async (templateId: string) => {
+    const today = format(new Date(), 'yyyy-MM-dd');
     navigation.navigate('WorkoutSession', { 
       date: today, 
       templateId 
     });
   };
 
-  const renderTemplate = ({ item }: { item: typeof mockTemplates[0] }) => (
+  const handleDeleteTemplate = (templateId: string) => {
+    const template = templates.find(t => t.id === templateId);
+    Alert.alert(
+      'Delete Template',
+      `Are you sure you want to delete "${template?.name}"? This action cannot be undone.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Delete', 
+          style: 'destructive', 
+          onPress: () => deleteTemplate(templateId)
+        },
+      ]
+    );
+  };
+
+  const renderTemplate = ({ item }: { item: typeof templates[0] }) => (
     <View className="bg-gray-800 rounded-lg p-4 mb-3 shadow-sm border border-gray-600">
       <View className="flex-row justify-between items-start mb-2">
         <View className="flex-1">
           <Text className="text-lg font-semibold text-gray-100 mb-1">
             {item.name}
           </Text>
-          <Text className="text-gray-300 text-sm mb-2">
-            {item.description}
-          </Text>
+          {item.description && (
+            <Text className="text-gray-300 text-sm mb-2">
+              {item.description}
+            </Text>
+          )}
           <View className="flex-row items-center">
             <Text className="text-xs text-gray-500 mr-4">
-              {item.exercises} exercises
-            </Text>
-            <Text className="text-xs text-gray-500 mr-4">
-              ~{item.estimatedDuration} min
+              {item.exercises?.length || 0} exercises
             </Text>
             <Text className="text-xs text-gray-500">
-              Used {item.usageCount} times
+              Used {item.usageCount || 0} times
             </Text>
           </View>
         </View>
         <TouchableOpacity
-          onPress={() => handleEditTemplate(item.id)}
+          onPress={() => handleDeleteTemplate(item.id)}
           className="p-2"
         >
-          <Text className="text-slate-400 text-sm">Edit</Text>
+          <Text className="text-red-400 text-sm">Delete</Text>
         </TouchableOpacity>
       </View>
       
@@ -131,33 +126,57 @@ const TemplatesScreen: React.FC = () => {
           <View className="flex-row justify-between">
             <View className="items-center">
               <Text className="text-2xl font-bold text-gray-100">
-                {mockTemplates.length}
+                {templates.length}
               </Text>
               <Text className="text-sm text-gray-600">Templates</Text>
             </View>
             <View className="items-center">
               <Text className="text-2xl font-bold text-gray-100">
-                {mockTemplates.reduce((sum, t) => sum + t.usageCount, 0)}
+                {templates.reduce((sum: number, t) => sum + (t.usageCount || 0), 0)}
               </Text>
-              <Text className="text-sm text-gray-600">Uses</Text>
-            </View>
-            <View className="items-center">
-              <Text className="text-2xl font-bold text-gray-100">
-                {Math.round(mockTemplates.reduce((sum, t) => sum + t.estimatedDuration, 0) / mockTemplates.length)}
-              </Text>
-              <Text className="text-sm text-gray-600">Avg Min</Text>
+              <Text className="text-sm text-gray-600">Total Uses</Text>
             </View>
           </View>
         </View>
 
         {/* Templates List */}
-        <FlatList
-          data={mockTemplates}
-          renderItem={renderTemplate}
-          keyExtractor={(item) => item.id}
-          showsVerticalScrollIndicator={false}
-          scrollEnabled={false}
-        />
+        {isLoading ? (
+          <View className="bg-gray-800 rounded-lg p-8 items-center">
+            <Text className="text-gray-300 text-lg">Loading templates...</Text>
+          </View>
+        ) : error ? (
+          <View className="bg-gray-800 rounded-lg p-8 items-center">
+            <Text className="text-red-400 text-lg mb-2">Error loading templates</Text>
+            <Text className="text-gray-400 text-sm text-center">{error}</Text>
+            <TouchableOpacity
+              onPress={loadTemplates}
+              className="bg-slate-600 rounded-lg px-4 py-2 mt-4"
+            >
+              <Text className="text-white font-medium">Retry</Text>
+            </TouchableOpacity>
+          </View>
+        ) : templates.length === 0 ? (
+          <View className="bg-gray-800 rounded-lg p-8 items-center">
+            <Text className="text-gray-300 text-lg mb-2">No templates yet</Text>
+            <Text className="text-gray-400 text-sm text-center mb-4">
+              Create your first workout template to get started
+            </Text>
+            <TouchableOpacity
+              onPress={handleCreateTemplate}
+              className="bg-slate-600 rounded-lg px-6 py-3"
+            >
+              <Text className="text-white font-medium">Create First Template</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <FlatList
+            data={templates}
+            renderItem={renderTemplate}
+            keyExtractor={(item) => item.id}
+            showsVerticalScrollIndicator={false}
+            scrollEnabled={false}
+          />
+        )}
       </ScrollView>
     </SafeAreaView>
   );

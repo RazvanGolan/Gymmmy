@@ -1,121 +1,120 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import { useWorkoutActions } from '../hooks/useWorkoutActions';
+import { useWorkoutsData } from '../hooks/useWorkoutsData';
+import { useTemplatesData } from '../hooks/useTemplatesData';
+import { useTemplateActions } from '../hooks/useTemplateActions';
+import { Workout, WorkoutSet, TemplateExercise } from '../types';
 
 type WorkoutSessionRouteProp = RouteProp<RootStackParamList, 'WorkoutSession'>;
 type NavigationProp = StackNavigationProp<RootStackParamList>;
-
-interface ExerciseSet {
-  id: string;
-  last: string;
-  reps: string;
-  weight: string;
-}
-
-interface WorkoutExercise {
-  id: string;
-  name: string;
-  sets: ExerciseSet[];
-}
 
 const WorkoutSessionScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<WorkoutSessionRouteProp>();
   const { date, templateId, workoutId } = route.params;
+  const { createWorkout, updateWorkout } = useWorkoutActions();
+  const { getWorkout } = useWorkoutsData();
+  const { getTemplate } = useTemplatesData();
+  const { incrementTemplateUsage } = useTemplateActions();
 
   const [workoutName, setWorkoutName] = useState('Workout Session');
-  const [exercises, setExercises] = useState<WorkoutExercise[]>([
-    {
-      id: '1',
-      name: 'Bench Press',
-      sets: [
-        { id: '1-1', last: '8x12kg', reps: '8', weight: '80' },
-        { id: '1-2', last: '8x12kg', reps: '8', weight: '80' },
-        { id: '1-3', last: '8x12kg', reps: '8', weight: '80' },
-      ],
-    },
-    {
-      id: '2',
-      name: 'Incline Dumbbell Press',
-      sets: [
-        { id: '2-1', last: '10x25kg', reps: '10', weight: '25' },
-        { id: '2-2', last: '10x25kg', reps: '10', weight: '25' },
-        { id: '2-3', last: '10x25kg', reps: '10', weight: '25' },
-      ],
-    },
-    { id: '3', name: 'Push Ups', sets: [{ id: '3-1', last: '15xBW', reps: '15', weight: 'bodyweight' }] },
-    {
-      id: '4',
-      name: 'Dumbbell Flyes',
-      sets: [
-        { id: '4-1', last: '12x15kg', reps: '12', weight: '15' },
-        { id: '4-2', last: '12x15kg', reps: '12', weight: '15' },
-        { id: '4-3', last: '12x15kg', reps: '12', weight: '15' },
-      ],
-    },
-  ]);
+  const [workoutSets, setWorkoutSets] = useState<WorkoutSet[]>([]);
   const [workoutNotes, setWorkoutNotes] = useState('');
+  const [startTime] = useState(new Date().toISOString());
 
-  const updateSetValue = (exerciseId: string, setId: string, field: 'reps' | 'weight', value: string) => {
-    setExercises(exercises.map(exercise => 
-      exercise.id === exerciseId 
-        ? {
-            ...exercise,
-            sets: exercise.sets.map(set => 
-              set.id === setId 
-                ? { ...set, [field]: value }
-                : set
-            )
+  useEffect(() => {
+    // If editing existing workout, load the data
+    if (workoutId) {
+      const existingWorkout = getWorkout(workoutId);
+      if (existingWorkout) {
+        setWorkoutName(existingWorkout.name || 'Workout Session');
+        setWorkoutNotes(existingWorkout.notes || '');
+        setWorkoutSets(existingWorkout.sets);
+      }
+    } else if (templateId) {
+      const template = getTemplate(templateId);
+      if (template) {
+        setWorkoutName(template.name);
+        
+        // Convert template exercises to workout sets
+        const templateSets: WorkoutSet[] = [];
+        template.exercises.forEach(exercise => {
+          for (let i = 0; i < exercise.sets; i++) {
+            templateSets.push({
+              id: `${exercise.exerciseId}-${i + 1}`,
+              exerciseId: exercise.exerciseId,
+              exerciseName: exercise.exerciseName,
+              reps: exercise.reps || 8,
+              weight: exercise.weight || 0,
+              completed: false,
+              notes: exercise.notes || '',
+            });
           }
-        : exercise
+        });
+        
+        setWorkoutSets(templateSets);
+      }
+    }
+  }, [workoutId, templateId, getWorkout, getTemplate]);
+
+  const updateSetValue = (setId: string, field: 'reps' | 'weight', value: string) => {
+    setWorkoutSets(workoutSets.map(set => 
+      set.id === setId 
+        ? { 
+            ...set, 
+            [field]: field === 'reps' ? parseInt(value) || 0 : parseFloat(value) || 0
+          }
+        : set
     ));
   };
 
   const addSet = (exerciseId: string) => {
-    const exercise = exercises.find(ex => ex.id === exerciseId);
-    if (!exercise) return;
-
-    const lastSet = exercise.sets[exercise.sets.length - 1];
-    // TODO: Get the last set weight from the database if available
-    const newSet: ExerciseSet = {
-      id: `${exerciseId}-${exercise.sets.length + 1}`,
-      last: lastSet?.last || '8x12kg',
-      reps: lastSet?.reps || '8',
-      weight: lastSet?.weight || '0',
+    const exerciseSets = workoutSets.filter(set => set.exerciseId === exerciseId);
+    const lastSet = exerciseSets[exerciseSets.length - 1];
+    const exerciseName = lastSet?.exerciseName || 'Unknown Exercise';
+    
+    const newSet: WorkoutSet = {
+      id: `${exerciseId}-${exerciseSets.length + 1}`,
+      exerciseId,
+      exerciseName,
+      reps: lastSet?.reps || 8,
+      weight: lastSet?.weight || 0,
+      completed: false,
+      notes: '',
     };
 
-    setExercises(exercises.map(ex => 
-      ex.id === exerciseId 
-        ? { ...ex, sets: [...ex.sets, newSet] }
-        : ex
-    ));
+    setWorkoutSets([...workoutSets, newSet]);
   };
 
   const addExercise = () => {
     navigation.navigate('AddExercise', {
-      onSelectExercise: (newExercise) => {
-        setExercises([...exercises, newExercise]);
+      onSelectExercise: (selectedExercise: { id: string; name: string }) => {
+        const newSet: WorkoutSet = {
+          id: `${selectedExercise.id}-1`,
+          exerciseId: selectedExercise.id,
+          exerciseName: selectedExercise.name,
+          reps: 8,
+          weight: 0,
+          completed: false,
+          notes: '',
+        };
+        setWorkoutSets([...workoutSets, newSet]);
       }
     });
   };
 
-  const removeSet = (exerciseId: string, setId: string) => {
-    setExercises(exercises.map(exercise => 
-      exercise.id === exerciseId 
-        ? {
-            ...exercise,
-            sets: exercise.sets.filter(set => set.id !== setId)
-          }
-        : exercise
-    ));
+  const removeSet = (setId: string) => {
+    setWorkoutSets(workoutSets.filter(set => set.id !== setId));
   };
 
   const removeExercise = (exerciseId: string) => {
-    setExercises(exercises.filter(exercise => exercise.id !== exerciseId));
+    setWorkoutSets(workoutSets.filter(set => set.exerciseId !== exerciseId));
   };
 
   const renderDeleteAction = (onDelete: () => void) => {
@@ -131,18 +130,47 @@ const WorkoutSessionScreen: React.FC = () => {
     );
   };
 
-
-
-  const finishWorkout = () => {
+  const finishWorkout = async () => {
     Alert.alert(
       'Finish Workout',
       'Are you sure you want to finish this workout?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Save', onPress: () => {
-          // TODO: Save workout to database
-          console.log('Workout saved');
-          navigation.goBack();
+        { text: 'Save', onPress: async () => {
+          try {
+            const endTime = new Date().toISOString();
+            const startTimeDate = new Date(startTime);
+            const endTimeDate = new Date(endTime);
+            const durationInMinutes = (endTimeDate.getTime() - startTimeDate.getTime()) / (1000 * 60);
+            const duration = Math.max(1, Math.round(durationInMinutes));
+
+            const workoutData: Omit<Workout, 'id' | 'createdAt' | 'updatedAt'> = {
+              name: workoutName,
+              date: date,
+              startTime: startTime,
+              endTime: endTime,
+              duration: duration,
+              sets: workoutSets,
+              templateId: templateId,
+              notes: workoutNotes,
+              completed: true,
+            };
+
+            if (workoutId) {
+              await updateWorkout(workoutId, workoutData);
+            } else {
+              await createWorkout(workoutData);
+              if (templateId) {
+                await incrementTemplateUsage(templateId);
+              }
+            }
+
+            console.log('Workout saved successfully');
+            navigation.goBack();
+          } catch (error) {
+            console.error('Failed to save workout:', error);
+            Alert.alert('Error', 'Failed to save workout. Please try again.');
+          }
         }},
       ]
     );
@@ -158,6 +186,25 @@ const WorkoutSessionScreen: React.FC = () => {
       ]
     );
   };
+
+  const getGroupedExercises = () => {
+    const grouped: { [exerciseId: string]: { exerciseId: string; exerciseName: string; sets: WorkoutSet[] } } = {};
+    
+    workoutSets.forEach(set => {
+      if (!grouped[set.exerciseId]) {
+        grouped[set.exerciseId] = {
+          exerciseId: set.exerciseId,
+          exerciseName: set.exerciseName,
+          sets: []
+        };
+      }
+      grouped[set.exerciseId].sets.push(set);
+    });
+    
+    return Object.values(grouped);
+  };
+
+  const groupedExercises = getGroupedExercises();
 
   return (
     <GestureHandlerRootView className="flex-1 bg-gray-900">
@@ -191,14 +238,14 @@ const WorkoutSessionScreen: React.FC = () => {
 
         {/* Exercises */}
         <View className="p-4">
-          {exercises.map((exercise, exerciseIndex) => (
+          {groupedExercises.map((exercise: { exerciseId: string; exerciseName: string; sets: WorkoutSet[] }, exerciseIndex: number) => (
             <Swipeable
-              key={exercise.id}
-              renderRightActions={() => renderDeleteAction(() => removeExercise(exercise.id))}
+              key={exercise.exerciseId}
+              renderRightActions={() => renderDeleteAction(() => removeExercise(exercise.exerciseId))}
             >
               <View className="bg-gray-800 rounded-lg p-4 mb-4 shadow-sm">
               <Text className="text-lg font-semibold text-gray-100 mb-3">
-                {exercise.name}
+                {exercise.exerciseName}
               </Text>
               
               {/* Sets Header */}
@@ -218,11 +265,11 @@ const WorkoutSessionScreen: React.FC = () => {
               </View>
 
               {/* Sets */}
-              {exercise.sets.map((set, setIndex) => {                
+              {exercise.sets.map((set: WorkoutSet, setIndex: number) => {                
                 return (
                   <Swipeable
                     key={set.id}
-                    renderRightActions={() => renderDeleteAction(() => removeSet(exercise.id, set.id))}
+                    renderRightActions={() => renderDeleteAction(() => removeSet(set.id))}
                   >
                     <View className="flex-row items-center justify-between mb-3 bg-gray-800">
                       <View className="w-16 items-center justify-center">
@@ -232,19 +279,19 @@ const WorkoutSessionScreen: React.FC = () => {
                       </View>
                       <View className="w-20 items-center justify-center">
                         <Text className="text-center text-gray-400 text-xs">
-                          {set.last}
+                          {set.reps}x{set.weight}kg
                         </Text>
                       </View>
                       <TextInput
-                        value={set.reps}
-                        onChangeText={(value) => updateSetValue(exercise.id, set.id, 'reps', value)}
+                        value={set.reps.toString()}
+                        onChangeText={(value) => updateSetValue(set.id, 'reps', value)}
                         className="w-16 px-2 py-1 border border-gray-600 rounded text-center bg-gray-700 text-gray-200"
                         keyboardType="numeric"
                         placeholder="0"
                       />
                       <TextInput
-                        value={set.weight}
-                        onChangeText={(value) => updateSetValue(exercise.id, set.id, 'weight', value)}
+                        value={set.weight?.toString() || '0'}
+                        onChangeText={(value) => updateSetValue(set.id, 'weight', value)}
                         className="w-20 px-2 py-1 border border-gray-600 rounded text-center bg-gray-700 text-gray-200"
                         keyboardType="numeric"
                         placeholder="0"
@@ -256,7 +303,7 @@ const WorkoutSessionScreen: React.FC = () => {
 
               {/* Add Set Button */}
               <TouchableOpacity
-                onPress={() => addSet(exercise.id)}
+                onPress={() => addSet(exercise.exerciseId)}
                 className="mt-4 bg-gray-600 rounded-lg py-2"
               >
                 <Text className="text-gray-200 text-center font-medium">

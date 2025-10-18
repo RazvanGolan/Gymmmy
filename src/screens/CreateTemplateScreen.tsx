@@ -6,38 +6,40 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { exerciseService, Exercise, categories } from '../services/exerciseService';
+import { useTemplatesData } from '../hooks/useTemplatesData';
+import { useTemplateActions } from '../hooks/useTemplateActions';
+import { TemplateExercise, WorkoutTemplate } from '../types';
 
 type CreateTemplateRouteProp = RouteProp<RootStackParamList, 'CreateTemplate'>;
 type NavigationProp = StackNavigationProp<RootStackParamList>;
-
-interface TemplateExercise {
-  id: string;
-  name: string;
-  sets: number;
-  reps: number;
-  weight?: number;
-  notes?: string;
-}
 
 const CreateTemplateScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<CreateTemplateRouteProp>();
   const { templateId } = route.params || {};
+  
+  const { getTemplate } = useTemplatesData();
+  const { createTemplate, updateTemplate: updateTemplateAction, loadTemplates } = useTemplateActions();
 
   const isEditing = !!templateId;
+  const [isLoading, setIsLoading] = useState(false);
 
-  const [templateName, setTemplateName] = useState(isEditing ? 'Push Day' : '');
-  const [templateDescription, setTemplateDescription] = useState(isEditing ? 'Chest, shoulders, and triceps workout' : '');
+  const [templateName, setTemplateName] = useState('');
+  const [templateDescription, setTemplateDescription] = useState('');
   
-  const [exercises, setExercises] = useState<TemplateExercise[]>(
-    isEditing 
-      ? [
-          { id: '1', name: 'Bench Press', sets: 3, reps: 8, weight: 80 },
-          { id: '2', name: 'Incline Dumbbell Press', sets: 3, reps: 10, weight: 25 },
-          { id: '3', name: 'Overhead Press', sets: 3, reps: 8, weight: 50 },
-        ]
-      : []
-  );
+  const [exercises, setExercises] = useState<TemplateExercise[]>([]);
+
+  // Load existing template if editing
+  useEffect(() => {
+    if (isEditing && templateId) {
+      const existingTemplate = getTemplate(templateId);
+      if (existingTemplate) {
+        setTemplateName(existingTemplate.name);
+        setTemplateDescription(existingTemplate.description || '');
+        setExercises(existingTemplate.exercises || []);
+      }
+    }
+  }, [isEditing, templateId, getTemplate]);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -45,11 +47,14 @@ const CreateTemplateScreen: React.FC = () => {
         const selectedExercise = (global as any).selectedExercise;
         const newExercise: TemplateExercise = {
           id: selectedExercise.id,
-          name: selectedExercise.name,
+          exerciseId: selectedExercise.id,
+          exerciseName: selectedExercise.name,
           sets: 3,
           reps: 8,
           weight: undefined,
+          duration: undefined,
           notes: '',
+          order: exercises.length,
         };
         setExercises(prev => [...prev, newExercise]);
         delete (global as any).selectedExercise;
@@ -62,17 +67,39 @@ const CreateTemplateScreen: React.FC = () => {
   const [showExerciseSelector, setShowExerciseSelector] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [availableExercises, setAvailableExercises] = useState<Exercise[]>([]);
+  const [loadingExercises, setLoadingExercises] = useState(false);
 
-  const availableExercises = exerciseService.searchExercises(searchQuery, selectedCategory)
-    .filter(ex => !exercises.some(templateEx => templateEx.name === ex.name));
+  useEffect(() => {
+    if (showExerciseSelector) {
+      loadAvailableExercises();
+    }
+  }, [showExerciseSelector, searchQuery, selectedCategory, exercises]);
+
+  const loadAvailableExercises = async () => {
+    try {
+      setLoadingExercises(true);
+      const allExercises = await exerciseService.searchExercises(searchQuery, selectedCategory);
+      const filtered = allExercises.filter(ex => !exercises.some(templateEx => templateEx.exerciseName === ex.name));
+      setAvailableExercises(filtered);
+    } catch (error) {
+      console.error('Failed to load exercises:', error);
+    } finally {
+      setLoadingExercises(false);
+    }
+  };
 
   const addExercise = (exercise: Exercise) => {
     const newExercise: TemplateExercise = {
       id: Date.now().toString(),
-      name: exercise.name,
+      exerciseId: exercise.id,
+      exerciseName: exercise.name,
       sets: 3,
       reps: 8,
       weight: undefined,
+      duration: undefined,
+      notes: '',
+      order: exercises.length,
     };
     setExercises([...exercises, newExercise]);
     setSearchQuery('');
@@ -81,7 +108,10 @@ const CreateTemplateScreen: React.FC = () => {
   };
 
   const removeExercise = (exerciseId: string) => {
-    setExercises(exercises.filter(ex => ex.id !== exerciseId));
+    const filtered = exercises.filter(ex => ex.id !== exerciseId);
+    // Reorder the remaining exercises
+    const reordered = filtered.map((ex, index) => ({ ...ex, order: index }));
+    setExercises(reordered);
   };
 
   const updateExercise = (exerciseId: string, field: keyof TemplateExercise, value: any) => {
@@ -90,7 +120,7 @@ const CreateTemplateScreen: React.FC = () => {
     ));
   };
 
-  const saveTemplate = () => {
+  const saveTemplate = async () => {
     if (!templateName.trim()) {
       Alert.alert('Error', 'Please enter a template name');
       return;
@@ -101,18 +131,40 @@ const CreateTemplateScreen: React.FC = () => {
       return;
     }
 
-    // TODO: Save template to database
-    console.log('Saving template:', {
-      name: templateName,
-      description: templateDescription,
-      exercises,
-    });
+    setIsLoading(true);
+    
+    try {
+      const templateData = {
+        name: templateName.trim(),
+        description: templateDescription.trim() || undefined,
+        exercises: exercises,
+      };
 
-    Alert.alert(
-      'Success',
-      `Template "${templateName}" ${isEditing ? 'updated' : 'created'} successfully!`,
-      [{ text: 'OK', onPress: () => navigation.goBack() }]
-    );
+      if (isEditing && templateId) {
+        await updateTemplateAction(templateId, templateData);
+        Alert.alert(
+          'Success',
+          `Template "${templateName}" updated successfully!`,
+          [{ text: 'OK', onPress: () => navigation.goBack() }]
+        );
+      } else {
+        const newTemplateId = await createTemplate(templateData);
+        if (newTemplateId) {
+          Alert.alert(
+            'Success',
+            `Template "${templateName}" created successfully!`,
+            [{ text: 'OK', onPress: () => navigation.goBack() }]
+          );
+        } else {
+          Alert.alert('Error', 'Failed to create template. Please try again.');
+        }
+      }
+    } catch (error) {
+      console.error('Save template error:', error);
+      Alert.alert('Error', 'Failed to save template. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const renderDeleteAction = (onDelete: () => void) => {
@@ -136,7 +188,7 @@ const CreateTemplateScreen: React.FC = () => {
       <View className="bg-gray-800 rounded-lg p-4 mb-3 shadow-sm">
         <View className="mb-3">
           <Text className="text-lg font-semibold text-gray-100">
-            {item.name}
+            {item.exerciseName}
           </Text>
         </View>
 
@@ -154,7 +206,7 @@ const CreateTemplateScreen: React.FC = () => {
         <View className="flex-1">
           <Text className="text-sm text-gray-300 mb-1">Reps</Text>
           <TextInput
-            value={item.reps.toString()}
+            value={(item.reps || 0).toString()}
             onChangeText={(value) => updateExercise(item.id, 'reps', parseInt(value) || 0)}
             className="border border-gray-600 rounded-lg p-2 text-center bg-gray-700 text-gray-200"
             keyboardType="numeric"
@@ -329,7 +381,7 @@ const CreateTemplateScreen: React.FC = () => {
               Exercises ({exercises.length})
             </Text>
             <TouchableOpacity
-              onPress={() => navigation.navigate('AddExercise', { onSelectExercise: () => {} })}
+              onPress={() => setShowExerciseSelector(true)}
               className="bg-slate-600 rounded-lg px-4 py-2"
             >
               <Text className="text-white font-medium">Add Exercise</Text>
@@ -358,10 +410,18 @@ const CreateTemplateScreen: React.FC = () => {
       <View className="bg-gray-800 border-t border-gray-700 p-4">
         <TouchableOpacity
           onPress={saveTemplate}
-          className="bg-slate-600 rounded-lg py-4"
+          disabled={isLoading}
+          className={`rounded-lg py-4 ${
+            isLoading ? 'bg-gray-600' : 'bg-slate-600'
+          }`}
         >
           <Text className="text-white text-center font-bold text-lg">
-            {isEditing ? 'Update Template' : 'Save Template'}
+            {isLoading 
+              ? 'Saving...' 
+              : isEditing 
+                ? 'Update Template' 
+                : 'Save Template'
+            }
           </Text>
         </TouchableOpacity>
       </View>
